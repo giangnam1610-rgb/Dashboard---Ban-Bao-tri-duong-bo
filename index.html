@@ -415,10 +415,10 @@ function parseGviz(json){
     return {id:g('id'),name:g('name'),tuyen,tc,ctr:'',
       kc:gDate('kc'),  // dùng gvizToDate thay vì g()
       ht:gDate('ht'),  // dùng gvizToDate thay vì g()
-      // Sheet "Tong hop" đã ở đơn vị tỷ đồng sẵn (không cần quy đổi thêm)
-      tmdt:n('tmdt'),hdXL:n('hdXL'),dp:n('dp'),kxl:n('kxl'),lkt:n('lkt'),lkg:n('lkg'),dc:n('dc'),st,
+      // Sheet "Tong hop" đang ở đơn vị triệu đồng → quy đổi /1000 để ra tỷ đồng (giống sheet cũ)
+      tmdt:n('tmdt')/1000,hdXL:n('hdXL')/1000,dp:n('dp')/1000,kxl:n('kxl')/1000,lkt:n('lkt')/1000,lkg:n('lkg')/1000,dc:n('dc'),st,
       updTH:gDate('updTH'),updGN:gDate('updGN'),
-      gnThang:n('gnThang'),thThang:n('thThang')};
+      gnThang:n('gnThang')/1000,thThang:n('thThang')/1000};
   });
   // Gộp các dòng tách theo nhà thầu (liên danh) vào công trình chính liền trước,
   // thay vì đếm mỗi dòng là 1 công trình riêng biệt.
