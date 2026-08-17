@@ -46,7 +46,7 @@ tr:hover td{background:rgba(34,211,238,.04)}
 .st{font-size:9px;font-weight:800;text-transform:uppercase;color:var(--cy);border-bottom:1px solid var(--bd);padding-bottom:7px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
 .stb{font-size:8px;font-weight:800;text-transform:uppercase;color:var(--cy);border-bottom:1px solid var(--bd);padding-bottom:6px;margin-bottom:9px}
 .tl-wrap{display:flex;flex-direction:column;gap:3px;width:100%}
-.tl-dates{display:flex;justify-content:space-between;font-size:8px;font-weight:700}
+.tl-dates{display:flex;justify-content:space-between;font-size:11px;font-weight:800}
 .tl-bar-bg{width:100%;height:7px;background:#0d2d38;border-radius:9999px;overflow:hidden;position:relative}
 .tl-bar-fill{height:7px;border-radius:9999px;position:absolute;left:0;top:0}
 .tl-info{font-size:8px;font-weight:800;text-align:center;margin-top:2px}
@@ -388,6 +388,17 @@ function parseGviz(json){
     }
     idx[k] = i;
   });
+  // "Ngày cập nhật" lặp lại 2 lần trong sheet với cùng tên "Ngày cập nhật giá trị"
+  // (1 cột theo sau "Tiến độ thực hiện/Giá trị thực hiện lũy kế", 1 cột theo sau "Giá trị/Tỷ lệ giải ngân")
+  // → không có từ khoá riêng để phân biệt qua tên cột, phải dò theo VỊ TRÍ: cột "ngày cập nhật" gần nhất
+  // đứng sau cột lkt là updTH, cột "ngày cập nhật" gần nhất đứng sau cột lkg là updGN.
+  // Bước này phải chạy TRƯỚC fallback theo vị trí cố định (bước 4 bên dưới), nếu không fallback sẽ
+  // gán nhầm vị trí cho updTH/updGN trước, khiến bước dò thông minh này không còn cơ hội chạy.
+  if(idx.updTH<0 || idx.updGN<0){
+    const upds = colsD.map((c,ci)=>({c,ci})).filter(o=>o.c.includes('ngay cap nhat'));
+    if(idx.updTH<0){ const cand=upds.find(o=>idx.lkt>=0?o.ci>idx.lkt:true); idx.updTH = cand?cand.ci:-1; }
+    if(idx.updGN<0){ const cand=upds.find(o=>(idx.lkg>=0?o.ci>idx.lkg:true) && o.ci!==idx.updTH); idx.updGN = cand?cand.ci:-1; }
+  }
   // 4) Fallback theo vị trí cột cố định của sheet "Tong hop" (dùng khi tiêu đề bị gộp/merge
   // qua 2 dòng khiến gviz không tự nhận diện được tên cột theo chữ).
   // Thứ tự cột thực tế: STT, Tên dự án, (cột trống), Tuyến, Tính chất, TMĐT, Giá trị xây lắp,
@@ -397,13 +408,6 @@ function parseGviz(json){
   COL_KEYS.forEach(k=>{
     if(idx[k]<0 && POS_FALLBACK[k]!=null && cols[POS_FALLBACK[k]]!==undefined) idx[k]=POS_FALLBACK[k];
   });
-  // "Ngày cập nhật" thường lặp lại 2 lần trong sheet (1 cho TH lũy kế, 1 cho GN lũy kế) → nếu cấu hình/từ khoá
-  // riêng không phân biệt được, lấy theo vị trí: cột đầu tiên sau lkt là updTH, cột đầu tiên sau lkg là updGN.
-  if(idx.updTH<0 || idx.updGN<0){
-    const upds = colsD.map((c,ci)=>({c,ci})).filter(o=>o.c.includes('ngay cap nhat'));
-    if(idx.updTH<0){ const cand=upds.find(o=>o.ci>idx.lkt); idx.updTH = cand?cand.ci:(upds[0]?upds[0].ci:-1); }
-    if(idx.updGN<0){ const cand=upds.find(o=>o.ci>idx.lkg && o.ci!==idx.updTH); idx.updGN = cand?cand.ci:(upds[1]?upds[1].ci:-1); }
-  }
   const raw = (json.table.rows||[]).map(row=>{
     const cell=(k)=>{const i=idx[k];return (i>=0&&row.c[i])?row.c[i]:null;};
     const g=(k,def)=>{const c=cell(k);return c&&c.v!=null?norm(String(c.v)):(def||'');};
@@ -515,13 +519,13 @@ function buildTimeline(kc,ht,status,lkt,hdXL,lkg,kxl,dp){
   // Nếu không có status nhưng đã có ngày KC/HT (do override) → vẫn render timeline
   if(!status && (!kcd||!htd)) return `<div class="tl-wrap" style="align-items:center"><div class="tl-chuathi">⏸ Mới khởi công</div>${gnBar}</div>`;
   const bc=(isCham&&!isDone)?'#f87171':'#4ade80';
-  if(isDone&&kcd&&htd)return `<div class="tl-wrap"><div class="tl-dates"><span style="color:#93c5fd">KC: ${fmtD(kc)}</span><span style="color:#fbbf24">HT: ${fmtD(ht)}</span></div><div class="tl-bar-bg"><div class="tl-bar-fill" style="width:100%;background:${bc}"></div></div><div class="tl-info" style="color:${bc}">✓ Hoàn thành</div>${gnBar}</div>`;
+  if(isDone&&kcd&&htd)return `<div class="tl-wrap"><div class="tl-dates"><span style="color:#93c5fd">KC: ${fmtD(kc)}</span><span style="color:#fbbf24">HT: ${fmtD(ht)}</span></div><div class="tl-bar-bg" style="height:7px"><div class="tl-bar-fill" style="width:100%;background:${bc};height:7px"></div></div><div class="tl-info" style="color:${bc};font-size:12px;font-weight:800;margin-top:3px">✓ Hoàn thành</div>${gnBar}</div>`;
   if(kcd&&htd){
     const total=daysBetween(kcd,htd),elapsed=Math.max(daysBetween(kcd,TODAY),0),rem=Math.max(daysBetween(TODAY,htd),0);
     const pct=total>0?Math.min(elapsed/total*100,100):0;
-    if(rem<=0)return `<div class="tl-wrap"><div class="tl-dates"><span style="color:#93c5fd">KC: ${fmtD(kc)}</span><span style="color:#fbbf24">HT: ${fmtD(ht)}</span></div><div class="tl-bar-bg"><div class="tl-bar-fill" style="width:100%;background:${bc}"></div></div><div class="tl-info" style="color:${bc}">✓ Hoàn thành</div>${gnBar}</div>`;
+    if(rem<=0)return `<div class="tl-wrap"><div class="tl-dates"><span style="color:#93c5fd">KC: ${fmtD(kc)}</span><span style="color:#fbbf24">HT: ${fmtD(ht)}</span></div><div class="tl-bar-bg" style="height:7px"><div class="tl-bar-fill" style="width:100%;background:${bc};height:7px"></div></div><div class="tl-info" style="color:${bc};font-size:12px;font-weight:800;margin-top:3px">✓ Hoàn thành</div>${gnBar}</div>`;
     const remColor=rem<=30?'#f87171':rem<=90?'#fbbf24':'#4ade80';
-    return `<div class="tl-wrap"><div class="tl-dates"><span style="color:#93c5fd">KC: ${fmtD(kc)}</span><span style="color:#fbbf24">HT: ${fmtD(ht)}</span></div><div class="tl-bar-bg"><div class="tl-bar-fill" style="width:${pct.toFixed(0)}%;background:${bc}"></div></div><div class="tl-info" style="color:${remColor}">⏱ ${rem} ngày còn lại</div>${gnBar}</div>`;
+    return `<div class="tl-wrap"><div class="tl-dates"><span style="color:#93c5fd">KC: ${fmtD(kc)}</span><span style="color:#fbbf24">HT: ${fmtD(ht)}</span></div><div class="tl-bar-bg" style="height:7px"><div class="tl-bar-fill" style="width:${pct.toFixed(0)}%;background:${bc};height:7px"></div></div><div class="tl-info" style="color:${remColor};font-size:12px;font-weight:800;margin-top:3px">⏱ ${rem} ngày còn lại</div>${gnBar}</div>`;
   }
   return `<div class="tl-wrap" style="align-items:center"><div class="tl-chuathi">⏸ Mới khởi công</div>${gnBar}</div>`;
 }
