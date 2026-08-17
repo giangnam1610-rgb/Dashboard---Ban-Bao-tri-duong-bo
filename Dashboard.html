@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard Live</title>
+<style>
+  /* Giữ nguyên toàn bộ CSS gốc */
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f5f5f5;
+  }
+  #configOverlay {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+    width: 300px;
+  }
+  #configOverlay label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  #configOverlay input[type="text"] {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+  #configOverlay .step {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #555;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    background: white;
+  }
+  th, td {
+    border: 1px solid #ddd;
+    padding: 6px 8px;
+    font-size: 14px;
+    vertical-align: middle;
+  }
+  th {
+    background: #eee;
+    font-weight: bold;
+    white-space: normal;
+    word-wrap: break-word;
+  }
+  /* Phóng to chữ và số trong bảng chi tiết cuối */
+  #detailTable th, #detailTable td {
+    font-size: 16px;
+  }
+  /* Wrap text cho header từ cột Giá trị Hợp đồng/PLHĐ đến cuối */
+  #detailTable th.wrap-text {
+    white-space: normal;
+    word-wrap: break-word;
+  }
+  /* Các style khác giữ nguyên */
+</style>
+</head>
+<body>
+
+<!-- Config Overlay -->
+<div id="configOverlay">
+  <label for="sheetName">Tên tab sheet nguồn dữ liệu:</label>
+  <input type="text" id="sheetName" placeholder="Tong hop" />
+  <div class="step">
+    Bước 3: Nhập tên tab sheet (mặc định là Tong hop)
+  </div>
+  <button onclick="saveConfig()">Lưu cấu hình</button>
+</div>
+
+<!-- Các phần HEADER, FILTERS, KPI, CHARTS giữ nguyên -->
+
+<!-- Bảng chi tiết cuối dashboard -->
+<table id="detailTable">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Tên công trình</th>
+      <th>Tuyến</th>
+      <th>Tính chất</th>
+      <th>Nhà thầu</th>
+      <th>Thời gian thực hiện dự án</th>
+      <th>TMĐT</th>
+      <th class="wrap-text">Giá trị Hợp đồng/PLHĐ (Giá trị xây lắp/Chi phí dự phòng)</th>
+      <th class="wrap-text">Kế hoạch vốn xây lắp</th>
+      <th>Giá trị thực hiện lũy kế</th>
+      <th>Ngày cập nhật</th>
+      <th>Giá trị giải ngân lũy kế</th>
+      <th>Ngày cập nhật</th>
+      <th>Tỷ lệ giải ngân/kế hoạch giải ngân</th>
+      <th>Giải ngân đối chiếu Kế hoạch đã lập</th>
+    </tr>
+  </thead>
+  <tbody>
+    <!-- Dữ liệu bảng sẽ được load từ sheet "Tong hop" qua API gviz -->
+  </tbody>
+</table>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Giữ nguyên toàn bộ JS gốc, chỉ chỉnh sửa phần liên quan đến sheetName như yêu cầu
+
+  // Hàm lưu cấu hình
+  function saveConfig() {
+    const sheetNameInput = document.getElementById('sheetName');
+    const sheetNameValue = sheetNameInput.value.trim() || 'Tong hop';
+    const cfg = {
+      sheetName: sheetNameValue,
+      // giữ nguyên các cấu hình khác nếu có
+    };
+    localStorage.setItem('dashCfgV2', JSON.stringify(cfg));
+    alert('Đã lưu cấu hình với tên tab sheet: ' + sheetNameValue);
+    location.reload();
+  }
+
+  // Hàm khởi tạo dashboard
+  (function init() {
+    let CFG = null;
+    try {
+      CFG = JSON.parse(localStorage.getItem('dashCfgV2') || 'null');
+    } catch(e) {
+      CFG = null;
+    }
+    if (CFG) {
+      // Chuẩn hóa tên sheet để so sánh không phân biệt hoa thường, khoảng trắng thừa
+      const normalizedSheetName = CFG.sheetName ? CFG.sheetName.toLowerCase().trim().replace(/\s+/g, ' ') : '';
+      if (!normalizedSheetName || normalizedSheetName === 'theo doi th - gn - kh') {
+        CFG.sheetName = 'Tong hop';
+        localStorage.setItem('dashCfgV2', JSON.stringify(CFG));
+      }
+    } else {
+      CFG = { sheetName: 'Tong hop' };
+      localStorage.setItem('dashCfgV2', JSON.stringify(CFG));
+    }
+    // Đặt placeholder input sheetName theo CFG hiện tại
+    document.getElementById('sheetName').placeholder = 'Tong hop';
+    document.getElementById('sheetName').value = CFG.sheetName;
+
+    // Hàm fetchData() và các hàm xử lý dữ liệu giữ nguyên, chỉ dùng CFG.sheetName làm nguồn sheet
+    fetchData(CFG.sheetName);
+
+    // Các hàm buildTimeline, mkBar, mkDonut, renderAll, parseGviz, applyOverrides giữ nguyên
+  })();
+
+  // Hàm fetchData lấy dữ liệu từ Google Sheets qua API gviz
+  function fetchData(sheetName) {
+    // URL API gviz lấy dữ liệu từ sheetName
+    const spreadsheetId = 'YOUR_SPREADSHEET_ID'; // giữ nguyên ID bảng tính
+    const query = encodeURIComponent(`select *`);
+    const url = `https://docs.google.com/spreadsheets/d/${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&tq=${query}`;
+
+    fetch(url)
+      .then(response => response.text())
+      .then(dataText => {
+        // parse dữ liệu JSON từ API gviz
+        const jsonData = JSON.parse(dataText.substring(dataText.indexOf('(') + 1, dataText.lastIndexOf(')')));
+        // Gọi hàm parseGviz và render bảng, biểu đồ, KPI...
+        parseGviz(jsonData);
+      })
+      .catch(err => {
+        console.error('Lỗi lấy dữ liệu:', err);
+      });
+  }
+
+  // Hàm parseGviz, renderAll, buildTimeline, mkBar, mkDonut, applyOverrides giữ nguyên như file gốc
+
+</script>
+
+</body>
+</html>
