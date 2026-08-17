@@ -240,9 +240,6 @@ tr:hover td{background:rgba(34,211,238,.04)}
 <script>
 /* ======= STATE ======= */
 let CFG = null, DATA = [], filtered = [], charts = {}, refreshTimer = null, countdown = 300;
-/* ── Bảng cuối lấy từ sheet "Tong hop" ── */
-const TABLE_SHEET = 'Tong hop';
-let TABLE_DATA = [], filteredTable = [];
 const TODAY = new Date(); // Ngày thực tế hôm nay
 const CC8 = ['#06b6d4','#3b82f6','#10b981','#f59e0b','#ef4444','#a78bfa','#f472b6','#84cc16'];
 const COL_KEYS = ['id','name','tuyen','tc','ctr','kc','ht','tmdt','hdXL','dp','kv','kxl','lkt','updTH','lkg','updGN','dc','st','t1t','t1g','t2t','t2g','t3t','t3g','t4t','t4g','t5t','t5g','t6t','t6g','kh1','kh2','kh3','kh4','kh5','kh6','khlk'];
@@ -318,7 +315,6 @@ async function fetchData(){
     filtered = [...DATA];
     rebuildFilters();
     renderAll();
-    fetchTableData(); // Load bảng cuối từ sheet "Tong hop"
     const now=new Date();
     document.getElementById('lastSync').textContent=`Cập nhật: ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     setStatus('ok','✅ Đồng bộ thành công');
@@ -329,46 +325,6 @@ async function fetchData(){
   }finally{
     document.getElementById('loadOverlay').style.display='none';
   }
-}
-
-/* ======= FETCH BẢNG CUỐI TỪ SHEET "Tong hop" ======= */
-async function fetchTableData(){
-  if(!CFG||!CFG.sheetId) return;
-  try{
-    const url=`https://docs.google.com/spreadsheets/d/${CFG.sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(TABLE_SHEET)}`;
-    const resp=await fetch(url);
-    if(!resp.ok) throw new Error('HTTP '+resp.status+' (sheet: '+TABLE_SHEET+')');
-    const text=await resp.text();
-    const jsonStr=text.replace(/^[^(]*\(/,'').replace(/\);?\s*$/,'');
-    const json=JSON.parse(jsonStr);
-    TABLE_DATA=parseGviz(json);
-    applyOverrides(TABLE_DATA);
-    // Áp dụng lại bộ lọc hiện tại cho TABLE_DATA
-    applyTableFilter();
-    renderTable();
-  }catch(e){
-    console.warn('fetchTableData lỗi:',e.message,
-      '— Dùng dữ liệu sheet chính làm fallback.');
-    TABLE_DATA=[...DATA];
-    filteredTable=[...filtered];
-    renderTable();
-  }
-}
-
-function applyTableFilter(){
-  const t=document.getElementById('fT').value,
-        tc=document.getElementById('fC').value,
-        n=document.getElementById('fN').value,
-        pid=document.getElementById('fP').value,
-        st=document.getElementById('fS').value;
-  filteredTable=TABLE_DATA.filter(d=>{
-    const nm=n==='ALL'||(n==='__e__'&&!d.ctr)||n===d.ctr;
-    const sm=st==='ALL'||(st==='cham'&&(d.st||'').includes('Chậm'))||(st==='ok'&&((d.st||'').includes('Hoàn thành')||(d.st||'').includes('Đảm bảo')))||(st==='chuathi'&&!d.st);
-    const pm=pid==='ALL'||d.id===pid||d.name===pid;
-    const tm=t==='ALL'||d.tuyen===t;
-    const tcm=tc==='ALL'||d.tc===tc;
-    return tm&&tcm&&nm&&pm&&sm;
-  });
 }
 
 /* ======= PARSE GVIZ JSON ======= */
@@ -531,9 +487,7 @@ function go(){
     const tcm=tc==='ALL'||d.tc===tc;
     return tm&&tcm&&nm&&pm&&sm;
   });
-  // Cũng lọc TABLE_DATA (bảng cuối từ sheet "Tong hop") theo cùng tiêu chí
-  applyTableFilter();
-  renderAll(); // renderAll sẽ gọi renderTable() bên trong
+  renderAll();
 }
 
 /* ======= TIMELINE ======= */
@@ -553,7 +507,7 @@ function buildTimeline(kc,ht,status,lkt,hdXL,lkg,kxl,dp){
   const gnBar=orangeBar+blueBar;
   // Nếu không có status nhưng đã có ngày KC/HT (do override) → vẫn render timeline
   if(!status && (!kcd||!htd)) return `<div class="tl-wrap" style="align-items:center"><div class="tl-chuathi">⏸ Mới khởi công</div>${gnBar}</div>`;
-  const bc=(isCham&&!isDone)?'#f87171':'#4ade80';
+  const bc=isCham?'#f87171':'#4ade80';
   if(isDone&&kcd&&htd)return `<div class="tl-wrap"><div class="tl-dates"><span style="color:#93c5fd">KC: ${fmtD(kc)}</span><span style="color:#fbbf24">HT: ${fmtD(ht)}</span></div><div class="tl-bar-bg"><div class="tl-bar-fill" style="width:100%;background:${bc}"></div></div><div class="tl-info" style="color:${bc}">✓ Hoàn thành</div>${gnBar}</div>`;
   if(kcd&&htd){
     const total=daysBetween(kcd,htd),elapsed=Math.max(daysBetween(kcd,TODAY),0),rem=Math.max(daysBetween(TODAY,htd),0);
@@ -644,12 +598,6 @@ function renderAll(){
   const tcColorMap={'Chuyển tiếp':'#22d3ee','Khởi công mới':'#f59e0b','Sửa chữa đột xuất':'#4ade80'};
   mkDonut('dTC',Object.keys(tcMap),Object.values(tcMap).map(v=>+(v/1000).toFixed(2)),Object.keys(tcMap).map((k,i)=>tcColorMap[k]||CC8[i%CC8.length]),null,true);
 
-  renderTable();
-}
-
-/* ======= RENDER BẢNG CUỐI (dùng filteredTable từ sheet "Tong hop") ======= */
-function renderTable(){
-  const f = filteredTable.length > 0 ? filteredTable : filtered; // fallback nếu chưa load xong
   document.getElementById('tb').innerHTML=f.map((d,i)=>{
     const ratioPct=d.khlk>0?Math.min(d.lkg/d.khlk*100,100):0;
     const ratioColor=ratioPct<30?'#ef4444':ratioPct<70?'#fbbf24':'#4ade80';
