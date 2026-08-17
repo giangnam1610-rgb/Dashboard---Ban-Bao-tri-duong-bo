@@ -168,10 +168,10 @@ tr:hover td{background:rgba(34,211,238,.04)}
 
 <!-- KPIs -->
 <div class="g4">
-  <div class="card kpi"><p>Tổng KH Vốn 2026</p><div class="v" id="kV" style="color:var(--cy)">—</div><div class="s">tỷ đồng</div></div>
-  <div class="card kpi"><p>Thực hiện lũy kế</p><div class="v" id="kTH" style="color:var(--bl)">—</div><div class="s">tỷ đồng</div></div>
-  <div class="card kpi"><p>Giải ngân lũy kế</p><div class="v" id="kGN" style="color:var(--gn)">—</div><div class="s">tỷ đồng</div></div>
-  <div class="card kpi"><p>Tỷ lệ GN / KH XL</p><div class="v" id="kR">—</div><div class="s">so với KH xây lắp</div></div>
+  <div class="card kpi"><p>Kế hoạch vốn gói thầu xây lắp</p><div class="v" id="kV" style="color:var(--cy)">—</div><div class="s">tỷ đồng</div></div>
+  <div class="card kpi"><p>Giá trị thực hiện lũy kế</p><div class="v" id="kTH" style="color:var(--bl)">—</div><div class="s">tỷ đồng</div></div>
+  <div class="card kpi"><p>Giá trị giải ngân lũy kế</p><div class="v" id="kGN" style="color:var(--gn)">—</div><div class="s">tỷ đồng</div></div>
+  <div class="card kpi"><p>Tỷ lệ giải ngân/Kế hoạch vốn gói thầu xây lắp</p><div class="v" id="kR">—</div><div class="s">so với KH vốn gói thầu xây lắp</div></div>
 </div>
 
 <!-- CHARTS -->
@@ -334,6 +334,17 @@ function gvizToDate(cell){
   // .v là chuỗi ngày tháng dạng yyyy-mm-dd
   const iso=v.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if(iso) return iso[3]+'/'+iso[2]+'/'+iso[1];
+  // .v là số serial ngày kiểu Google Sheets (số ngày kể từ 30/12/1899)
+  // Chỉ chấp nhận trong khoảng hợp lý (~năm 1950 - 2100), tránh hiện số rác khi ô bị lệch cột/sai dữ liệu
+  if(/^-?\d+(\.\d+)?$/.test(v)){
+    const num=parseFloat(v);
+    if(num>=18000 && num<=73000){
+      const epoch=new Date(Date.UTC(1899,11,30));
+      const d=new Date(epoch.getTime()+Math.round(num)*86400000);
+      return d.getUTCDate()+'/'+(d.getUTCMonth()+1)+'/'+d.getUTCFullYear();
+    }
+    return ''; // Số không hợp lệ làm ngày → bỏ trống thay vì hiện số rác
+  }
   // Fallback: trả về nguyên bản
   return norm(v);
 }
@@ -354,7 +365,7 @@ const COL_HINTS = {
   kxl:['ke hoach von goi thau xay lap','ke hoach von xay lap'],
   lkt:['gia tri thuc hien luy ke'],
   lkg:['gia tri giai ngan luy ke'],
-  dc:['ty le giai ngan/ ke hoach giai ngan','ty le giai ngan/ke hoach giai ngan','ty le giai ngan'],
+  dc:['ty le giai ngan/ ke hoach giai ngan','ty le giai ngan/ke hoach giai ngan','ty le giai ngan/ke hoach von','giai ngan/ke hoach'],
   st:['trang thai'],
   gnThang:['gia tri can giai ngan trong thang'],
   thThang:['gia tri can phai thuc hien trong thang']
@@ -429,6 +440,11 @@ function parseGviz(json){
   raw.forEach(r=>{
     const isEmptyRow = !r.id && !r.name && !r.tmdt && !r.hdXL && !r.kxl && !r.lkt && !r.lkg;
     if(isEmptyRow) return; // Dòng trống hoàn toàn → bỏ qua
+    // Dòng "Tổng" là dòng tổng hợp toàn sheet (SUM của các công trình) → không phải 1 công trình,
+    // loại khỏi dữ liệu để không bị đếm/tính trùng vào KPI, bảng, biểu đồ.
+    const nameDe = deAccent(r.name);
+    const isTotalRow = nameDe==='tong' || nameDe.startsWith('tong ') || nameDe.startsWith('tong cong') || nameDe.startsWith('tong so');
+    if(isTotalRow) return;
     if(r.tmdt>0 || !current){ // Dòng công trình chính: có TMĐT riêng (hoặc chưa có công trình cha nào trước đó)
       r.breakdown=[];
       result.push(r);
