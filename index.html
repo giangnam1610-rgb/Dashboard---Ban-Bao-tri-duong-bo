@@ -90,58 +90,38 @@ tr:hover td{background:rgba(34,211,238,.04)}
       Lấy phần <strong>SHEET_ID</strong> (chuỗi dài ở giữa URL) dán vào ô bên dưới.
     </div>
     <div class="step">
-      <strong>Bước 3:</strong> Nhập tên tab sheet (mặc định là <code>Sheet1</code>) và nhấn <strong>Lưu & Tải</strong>.
+      <strong>Bước 3:</strong> Nhập tên tab sheet cần lấy dữ liệu là <code>Tong hop</code> (đã điền sẵn) và nhấn <strong>Lưu & Tải</strong>.
     </div>
 
     <div style="margin-bottom:10px">
       <label class="lbl">Sheet ID</label>
       <input type="text" id="sheetId" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" style="width:100%;margin-bottom:8px">
       <label class="lbl">Tên sheet (tab)</label>
-      <input type="text" id="sheetName" placeholder="Sheet1" style="width:100%">
+      <input type="text" id="sheetName" placeholder="Tong hop" value="Tong hop" style="width:100%">
     </div>
 
     <details style="margin-bottom:10px">
       <summary style="cursor:pointer;font-size:10px;font-weight:700;color:var(--cy);margin-bottom:8px">⚙ Tuỳ chỉnh mapping cột (mở rộng nếu cần)</summary>
       <p style="font-size:9px;color:var(--t3);margin-bottom:6px">Nhập đúng tên tiêu đề cột trong Google Sheet. Để trống = dùng tên mặc định.</p>
       <div class="col-map">
-        <div><label>ID công trình</label><input id="c_id" placeholder="id"></div>
-        <div><label>Tên công trình</label><input id="c_name" placeholder="name"></div>
+        <div><label>STT</label><input id="c_id" placeholder="id"></div>
+        <div><label>Tên dự án</label><input id="c_name" placeholder="name"></div>
         <div><label>Tuyến</label><input id="c_tuyen" placeholder="tuyen"></div>
         <div><label>Tính chất</label><input id="c_tc" placeholder="tc"></div>
-        <div><label>Nhà thầu</label><input id="c_ctr" placeholder="ctr"></div>
         <div><label>Ngày khởi công</label><input id="c_kc" placeholder="kc"></div>
         <div><label>Ngày hoàn thành</label><input id="c_ht" placeholder="ht"></div>
-        <div><label>TMĐT (triệu đ)</label><input id="c_tmdt" placeholder="tmdt"></div>
-        <div><label>Giá trị xây lắp (GT HĐ XL)</label><input id="c_hdXL" placeholder="hdXL"></div>
+        <div><label>Tổng mức đầu tư</label><input id="c_tmdt" placeholder="tmdt"></div>
+        <div><label>Giá trị xây lắp</label><input id="c_hdXL" placeholder="hdXL"></div>
         <div><label>Chi phí dự phòng</label><input id="c_dp" placeholder="dp"></div>
-        <div><label>KH Vốn 2026</label><input id="c_kv" placeholder="kv"></div>
-        <div><label>KH Vốn XL</label><input id="c_kxl" placeholder="kxl"></div>
-        <div><label>TH lũy kế</label><input id="c_lkt" placeholder="lkt"></div>
-        <div><label>Ngày cập nhật TH lũy kế</label><input id="c_updTH" placeholder="updTH"></div>
-        <div><label>GN lũy kế</label><input id="c_lkg" placeholder="lkg"></div>
-        <div><label>Ngày cập nhật GN lũy kế</label><input id="c_updGN" placeholder="updGN"></div>
-        <div><label>GN đối chiếu KH (%)</label><input id="c_dc" placeholder="dc"></div>
-        <div><label>Trạng thái</label><input id="c_st" placeholder="st"></div>
-        <div><label>T1 Thực hiện</label><input id="c_t1t" placeholder="t1t"></div>
-        <div><label>T1 Giải ngân</label><input id="c_t1g" placeholder="t1g"></div>
-        <div><label>T2 Thực hiện</label><input id="c_t2t" placeholder="t2t"></div>
-        <div><label>T2 Giải ngân</label><input id="c_t2g" placeholder="t2g"></div>
-        <div><label>T3 Thực hiện</label><input id="c_t3t" placeholder="t3t"></div>
-        <div><label>T3 Giải ngân</label><input id="c_t3g" placeholder="t3g"></div>
-        <div><label>T4 Thực hiện</label><input id="c_t4t" placeholder="t4t"></div>
-        <div><label>T4 Giải ngân</label><input id="c_t4g" placeholder="t4g"></div>
-        <div><label>T5 Thực hiện</label><input id="c_t5t" placeholder="t5t"></div>
-        <div><label>T5 Giải ngân</label><input id="c_t5g" placeholder="t5g"></div>
-        <div><label>T6 Thực hiện</label><input id="c_t6t" placeholder="t6t"></div>
-        <div><label>T6 Giải ngân</label><input id="c_t6g" placeholder="t6g"></div>
-        <div style="grid-column:1/-1;border-top:1px solid var(--bd);padding-top:8px;margin-top:4px"><p style="font-size:9px;color:var(--cy);font-weight:800;margin-bottom:6px">📊 Kế hoạch từng tháng & lũy kế</p></div>
-        <div><label>KH Tháng 1</label><input id="c_kh1" placeholder="kh1"></div>
-        <div><label>KH Tháng 2</label><input id="c_kh2" placeholder="kh2"></div>
-        <div><label>KH Tháng 3</label><input id="c_kh3" placeholder="kh3"></div>
-        <div><label>KH Tháng 4</label><input id="c_kh4" placeholder="kh4"></div>
-        <div><label>KH Tháng 5</label><input id="c_kh5" placeholder="kh5"></div>
-        <div><label>KH Tháng 6</label><input id="c_kh6" placeholder="kh6"></div>
-        <div><label>KH Lũy kế</label><input id="c_khlk" placeholder="khlk"></div>
+        <div><label>KH vốn gói thầu xây lắp</label><input id="c_kxl" placeholder="kxl"></div>
+        <div><label>Giá trị thực hiện lũy kế</label><input id="c_lkt" placeholder="lkt"></div>
+        <div><label>Ngày cập nhật (TH)</label><input id="c_updTH" placeholder="updTH"></div>
+        <div><label>Giá trị giải ngân lũy kế</label><input id="c_lkg" placeholder="lkg"></div>
+        <div><label>Ngày cập nhật (GN)</label><input id="c_updGN" placeholder="updGN"></div>
+        <div><label>Tỷ lệ GN/KH giải ngân</label><input id="c_dc" placeholder="dc"></div>
+        <div><label>Trạng thái (nếu có cột riêng)</label><input id="c_st" placeholder="st"></div>
+        <div><label>Giá trị cần GN trong tháng</label><input id="c_gnThang" placeholder="gnThang"></div>
+        <div><label>Giá trị cần TH trong tháng</label><input id="c_thThang" placeholder="thThang"></div>
       </div>
     </details>
 
@@ -196,7 +176,7 @@ tr:hover td{background:rgba(34,211,238,.04)}
 
 <!-- CHARTS -->
 <div class="g2">
-  <div class="card" style="padding:12px"><div class="st">📊 Thực hiện & Giải ngân · Theo Tháng/Quý</div><div style="height:260px;position:relative"><canvas id="cM"></canvas></div></div>
+  <div class="card" style="padding:12px"><div class="st">📊 Nhu cầu vốn cần Thực hiện/Giải ngân trong tháng</div><div style="height:260px;position:relative"><canvas id="cM"></canvas></div></div>
   <div class="card" style="padding:12px"><div class="st">📈 Thực hiện & Giải ngân Lũy kế</div><div style="height:260px;position:relative"><canvas id="cQ"></canvas></div></div>
 </div>
 <div class="g3">
@@ -224,13 +204,14 @@ tr:hover td{background:rgba(34,211,238,.04)}
       <th rowspan="2" style="text-align:right;white-space:normal;max-width:90px">Giá trị giải ngân lũy kế<br><span style="color:var(--t3)">(tỷ)</span></th>
       <th rowspan="2" style="text-align:center;white-space:normal;max-width:75px">Ngày cập nhật</th>
       <th rowspan="2" style="min-width:90px;white-space:normal;max-width:100px">Tỷ lệ giải ngân/kế hoạch giải ngân</th>
-      <th rowspan="2" style="text-align:center;min-width:85px;white-space:normal;max-width:100px">Giải ngân đối chiếu Kế hoạch đã lập</th>
+      <th rowspan="2" style="text-align:right;white-space:normal;max-width:90px">Giá trị cần GN trong tháng<br><span style="color:var(--t3)">(tỷ)</span></th>
+      <th rowspan="2" style="text-align:right;white-space:normal;max-width:90px">Giá trị cần TH trong tháng<br><span style="color:var(--t3)">(tỷ)</span></th>
     </tr>
     <tr>
       <th class="sub" style="text-align:right;border-left:1px solid var(--bd);white-space:normal;max-width:80px">Giá trị xây lắp<br><span style="color:var(--t3)">(tỷ)</span></th>
       <th class="sub" style="text-align:right;white-space:normal;max-width:80px">Chi phí dự phòng<br><span style="color:var(--t3)">(tỷ)</span></th>
     </tr></thead>
-    <tbody id="tb"><tr><td colspan="16" style="text-align:center;padding:30px;color:var(--t3)">⏳ Nhấn ⚙ Cấu hình để kết nối Google Sheets</td></tr></tbody>
+    <tbody id="tb"><tr><td colspan="17" style="text-align:center;padding:30px;color:var(--t3)">⏳ Nhấn ⚙ Cấu hình để kết nối Google Sheets</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -240,15 +221,12 @@ tr:hover td{background:rgba(34,211,238,.04)}
 <script>
 /* ======= STATE ======= */
 let CFG = null, DATA = [], filtered = [], charts = {}, refreshTimer = null, countdown = 300;
-/* ── Bảng cuối lấy từ sheet "Tong hop" ── */
-const TABLE_SHEET = 'Tong hop';
-let TABLE_DATA = [], filteredTable = [];
 const TODAY = new Date(); // Ngày thực tế hôm nay
 const CC8 = ['#06b6d4','#3b82f6','#10b981','#f59e0b','#ef4444','#a78bfa','#f472b6','#84cc16'];
-const COL_KEYS = ['id','name','tuyen','tc','ctr','kc','ht','tmdt','hdXL','dp','kv','kxl','lkt','updTH','lkg','updGN','dc','st','t1t','t1g','t2t','t2g','t3t','t3g','t4t','t4g','t5t','t5g','t6t','t6g','kh1','kh2','kh3','kh4','kh5','kh6','khlk'];
+const COL_KEYS = ['id','name','tuyen','tc','st','kc','ht','tmdt','hdXL','dp','kxl','lkt','updTH','lkg','updGN','dc','gnThang','thThang'];
 
 /* ======= HELPERS ======= */
-const Ty  = v => (parseFloat((v||'').toString().replace(/,/g,'.'))||0)/1000;
+const Ty  = v => (parseFloat((v||'').toString().replace(/,/g,'.'))||0); // sheet "Tong hop" đã ở đơn vị tỷ đồng
 const TyF = v => Ty(v).toFixed(2);
 const N   = v => new Intl.NumberFormat('vi-VN',{maximumFractionDigits:2}).format(Ty(v));
 const SC  = s => !s?'bg-x':s.includes('Chậm')?'bg-r':(s.includes('Hoàn thành')||s.includes('Đảm bảo'))?'bg-g':'bg-x';
@@ -260,7 +238,7 @@ function daysBetween(a,b){return Math.round((b-a)/86400000);}
 function openCfg(){
   if(CFG){
     document.getElementById('sheetId').value=CFG.sheetId||'';
-    document.getElementById('sheetName').value=CFG.sheetName||'Sheet1';
+    document.getElementById('sheetName').value=CFG.sheetName||'Tong hop';
     COL_KEYS.forEach(k=>{const el=document.getElementById('c_'+k);if(el)el.value=CFG.colMap&&CFG.colMap[k]?CFG.colMap[k]:'';});
   }
   document.getElementById('cfgOverlay').style.display='flex';
@@ -272,7 +250,7 @@ function saveConfig(){
   if(!sid){alert('Vui lòng nhập Sheet ID!');return;}
   const colMap={};
   COL_KEYS.forEach(k=>{const v=(document.getElementById('c_'+k)||{}).value||'';colMap[k]=v||k;});
-  CFG={sheetId:sid, sheetName:document.getElementById('sheetName').value.trim()||'Sheet1', colMap};
+  CFG={sheetId:sid, sheetName:document.getElementById('sheetName').value.trim()||'Tong hop', colMap};
   try{localStorage.setItem('dashCfgV2',JSON.stringify(CFG));}catch(e){}
   document.getElementById('cfgOverlay').style.display='none';
   startAutoRefresh();
@@ -318,7 +296,6 @@ async function fetchData(){
     filtered = [...DATA];
     rebuildFilters();
     renderAll();
-    fetchTableData(); // Load bảng cuối từ sheet "Tong hop"
     const now=new Date();
     document.getElementById('lastSync').textContent=`Cập nhật: ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     setStatus('ok','✅ Đồng bộ thành công');
@@ -329,46 +306,6 @@ async function fetchData(){
   }finally{
     document.getElementById('loadOverlay').style.display='none';
   }
-}
-
-/* ======= FETCH BẢNG CUỐI TỪ SHEET "Tong hop" ======= */
-async function fetchTableData(){
-  if(!CFG||!CFG.sheetId) return;
-  try{
-    const url=`https://docs.google.com/spreadsheets/d/${CFG.sheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(TABLE_SHEET)}`;
-    const resp=await fetch(url);
-    if(!resp.ok) throw new Error('HTTP '+resp.status+' (sheet: '+TABLE_SHEET+')');
-    const text=await resp.text();
-    const jsonStr=text.replace(/^[^(]*\(/,'').replace(/\);?\s*$/,'');
-    const json=JSON.parse(jsonStr);
-    TABLE_DATA=parseGviz(json);
-    applyOverrides(TABLE_DATA);
-    // Áp dụng lại bộ lọc hiện tại cho TABLE_DATA
-    applyTableFilter();
-    renderTable();
-  }catch(e){
-    console.warn('fetchTableData lỗi:',e.message,
-      '— Dùng dữ liệu sheet chính làm fallback.');
-    TABLE_DATA=[...DATA];
-    filteredTable=[...filtered];
-    renderTable();
-  }
-}
-
-function applyTableFilter(){
-  const t=document.getElementById('fT').value,
-        tc=document.getElementById('fC').value,
-        n=document.getElementById('fN').value,
-        pid=document.getElementById('fP').value,
-        st=document.getElementById('fS').value;
-  filteredTable=TABLE_DATA.filter(d=>{
-    const nm=n==='ALL'||(n==='__e__'&&!d.ctr)||n===d.ctr;
-    const sm=st==='ALL'||(st==='cham'&&(d.st||'').includes('Chậm'))||(st==='ok'&&((d.st||'').includes('Hoàn thành')||(d.st||'').includes('Đảm bảo')))||(st==='chuathi'&&!d.st);
-    const pm=pid==='ALL'||d.id===pid||d.name===pid;
-    const tm=t==='ALL'||d.tuyen===t;
-    const tcm=tc==='ALL'||d.tc===tc;
-    return tm&&tcm&&nm&&pm&&sm;
-  });
 }
 
 /* ======= PARSE GVIZ JSON ======= */
@@ -409,24 +346,19 @@ function deAccent(s){
 
 // Từ khoá gợi ý để tự nhận diện cột khi tên cột trong Google Sheet không khớp 100% với cấu hình đã lưu
 const COL_HINTS = {
-  id:['stt'], name:['ten cong trinh','ten du an'], tuyen:['tuyen'], tc:['tinh chat'], ctr:['nha thau'],
-  kc:['ngay kc','ngay khoi cong'], ht:['ngay ht','ngay hoan thanh'],
-  tmdt:['tmdt','tong muc dau tu'],
-  hdXL:['gia tri xay lap','gia tri hop dong xay lap','gt hd xl'],
+  id:['stt'], name:['ten du an','ten cong trinh'], tuyen:['tuyen'], tc:['tinh chat'],
+  kc:['ngay khoi cong'], ht:['ngay hoan thanh'],
+  tmdt:['tong muc dau tu','tmdt'],
+  hdXL:['gia tri xay lap'],
   dp:['chi phi du phong','du phong'],
-  kv:['ke hoach von 2026'],
-  kxl:['ke hoach von xay lap','ke hoach von goi thau xay lap','ke hoach von cho xay lap'],
-  lkt:['thuc hien luy ke','gia tri thuc hien luy ke'],
-  lkg:['giai ngan luy ke','gia tri giai ngan luy ke'],
-  dc:['giai ngan doi chieu','doi chieu ke hoach'],
+  kxl:['ke hoach von goi thau xay lap','ke hoach von xay lap'],
+  lkt:['gia tri thuc hien luy ke'],
+  lkg:['gia tri giai ngan luy ke'],
+  dc:['ty le giai ngan/ ke hoach giai ngan','ty le giai ngan/ke hoach giai ngan','ty le giai ngan'],
   st:['trang thai'],
-  khlk:['ke hoach giai ngan luy ke','ke hoach von giai ngan luy ke']
+  gnThang:['gia tri can giai ngan trong thang'],
+  thThang:['gia tri can phai thuc hien trong thang']
 };
-['1','2','3','4','5','6'].forEach(n=>{
-  COL_HINTS['t'+n+'t']=['thang '+n+' thuc hien'];
-  COL_HINTS['t'+n+'g']=['thang '+n+' giai ngan'];
-  COL_HINTS['kh'+n]=['thang '+n+' ke hoach'];
-});
 
 function parseGviz(json){
   const cols = json.table.cols.map(c=>norm(c.label||c.id));
@@ -448,6 +380,15 @@ function parseGviz(json){
     }
     idx[k] = i;
   });
+  // 4) Fallback theo vị trí cột cố định của sheet "Tong hop" (dùng khi tiêu đề bị gộp/merge
+  // qua 2 dòng khiến gviz không tự nhận diện được tên cột theo chữ).
+  // Thứ tự cột thực tế: STT, Tên dự án, (cột trống), Tuyến, Tính chất, TMĐT, Giá trị xây lắp,
+  // Chi phí dự phòng, Ngày KC, Ngày HT, KH vốn XL, TH lũy kế, Tiến độ TH%, Ngày cập nhật(TH),
+  // GN lũy kế, Tỷ lệ GN%, Ngày cập nhật(GN), Tỷ lệ GN/KH GN, GN cần trong tháng, TH cần trong tháng
+  const POS_FALLBACK = {id:0,name:1,tuyen:3,tc:4,tmdt:5,hdXL:6,dp:7,kc:8,ht:9,kxl:10,lkt:11,updTH:13,lkg:14,updGN:16,dc:17,gnThang:18,thThang:19};
+  COL_KEYS.forEach(k=>{
+    if(idx[k]<0 && POS_FALLBACK[k]!=null && cols[POS_FALLBACK[k]]!==undefined) idx[k]=POS_FALLBACK[k];
+  });
   // "Ngày cập nhật" thường lặp lại 2 lần trong sheet (1 cho TH lũy kế, 1 cho GN lũy kế) → nếu cấu hình/từ khoá
   // riêng không phân biệt được, lấy theo vị trí: cột đầu tiên sau lkt là updTH, cột đầu tiên sau lkg là updGN.
   if(idx.updTH<0 || idx.updGN<0){
@@ -462,25 +403,31 @@ function parseGviz(json){
     const n=(k)=>{const v=g(k,'0');return parseFloat(v.replace(/,/g,'.'))||0;};
     const rawTuyen=g('tuyen');
     const rawTc=g('tc');
-    const tuyen=rawTuyen.toLowerCase().includes('qu')&&rawTuyen.toLowerCase().includes('c')?'Quốc lộ':rawTuyen.toLowerCase().includes('t')&&rawTuyen.toLowerCase().includes('nh')?'Tỉnh lộ':rawTuyen;
-    const tc=rawTc.toLowerCase().includes('chuy')?'Chuyển tiếp':rawTc.toLowerCase().includes('kh')?'Khởi công mới':rawTc;
-    return {id:g('id'),name:g('name'),tuyen,tc,ctr:g('ctr'),
+    const tuyen=rawTuyen.toLowerCase().includes('qu')&&rawTuyen.toLowerCase().includes('c')?'Quốc lộ':(rawTuyen.toLowerCase().includes('t')&&rawTuyen.toLowerCase().includes('nh'))||rawTuyen.toLowerCase().includes('dt')?'Tỉnh lộ':rawTuyen;
+    // Sheet "Tong hop" gộp Trạng thái vào trong ngoặc đơn của cột Tính chất, ví dụ:
+    // "Chuyển tiếp   (Đang thực hiện)" hoặc "Khởi công mới 2026    (Đang thực hiện)" hoặc "Chuyển tiếp   (Đã hoàn thành)"
+    const tcMatch = rawTc.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+    const tcBase = (tcMatch?tcMatch[1]:rawTc).trim();
+    const tc = tcBase.toLowerCase().includes('chuy')?'Chuyển tiếp':tcBase.toLowerCase().includes('kh')?'Khởi công mới':tcBase;
+    const stFromTc = tcMatch?tcMatch[2].trim():'';
+    const stCol = g('st');
+    const st = stCol || stFromTc;
+    return {id:g('id'),name:g('name'),tuyen,tc,ctr:'',
       kc:gDate('kc'),  // dùng gvizToDate thay vì g()
       ht:gDate('ht'),  // dùng gvizToDate thay vì g()
-      tmdt:n('tmdt'),hdXL:n('hdXL'),dp:n('dp'),kv:n('kv'),kxl:n('kxl'),lkt:n('lkt'),lkg:n('lkg'),dc:n('dc'),st:g('st'),
+      // Sheet "Tong hop" đã ở đơn vị tỷ đồng sẵn (không cần quy đổi thêm)
+      tmdt:n('tmdt'),hdXL:n('hdXL'),dp:n('dp'),kxl:n('kxl'),lkt:n('lkt'),lkg:n('lkg'),dc:n('dc'),st,
       updTH:gDate('updTH'),updGN:gDate('updGN'),
-      t1t:n('t1t'),t1g:n('t1g'),t2t:n('t2t'),t2g:n('t2g'),t3t:n('t3t'),t3g:n('t3g'),
-      t4t:n('t4t'),t4g:n('t4g'),t5t:n('t5t'),t5g:n('t5g'),t6t:n('t6t'),t6g:n('t6g'),
-      kh1:n('kh1'),kh2:n('kh2'),kh3:n('kh3'),kh4:n('kh4'),kh5:n('kh5'),kh6:n('kh6'),khlk:n('khlk')};
+      gnThang:n('gnThang'),thThang:n('thThang')};
   });
   // Gộp các dòng tách theo nhà thầu (liên danh) vào công trình chính liền trước,
   // thay vì đếm mỗi dòng là 1 công trình riêng biệt.
   // Nhận diện: dòng "chính" luôn có TMĐT > 0 (mỗi công trình chỉ có 1 TMĐT duy nhất);
-  // dòng "chi tiết nhà thầu" có TMĐT = 0 dù cột Tên công trình có bị điền nhầm tên nhà thầu vào hay không.
+  // dòng "chi tiết nhà thầu" có TMĐT = 0, tên nhà thầu nằm trong cột Tên dự án.
   const result=[];
   let current=null;
   raw.forEach(r=>{
-    const isEmptyRow = !r.id && !r.name && !r.ctr && !r.tmdt && !r.hdXL && !r.kv && !r.kxl && !r.lkt && !r.lkg;
+    const isEmptyRow = !r.id && !r.name && !r.tmdt && !r.hdXL && !r.kxl && !r.lkt && !r.lkg;
     if(isEmptyRow) return; // Dòng trống hoàn toàn → bỏ qua
     if(r.tmdt>0 || !current){ // Dòng công trình chính: có TMĐT riêng (hoặc chưa có công trình cha nào trước đó)
       r.breakdown=[];
@@ -488,7 +435,9 @@ function parseGviz(json){
       current=r;
     }else{
       // Dòng chi tiết theo nhà thầu (TMĐT=0) → gắn vào công trình chính, không tính là công trình mới
-      current.breakdown.push({ctr:r.ctr||r.name,hdXL:r.hdXL,dp:r.dp,kv:r.kv,kxl:r.kxl,lkt:r.lkt,lkg:r.lkg,khlk:r.khlk});
+      current.breakdown.push({ctr:r.name,hdXL:r.hdXL,dp:r.dp,kxl:r.kxl,lkt:r.lkt,lkg:r.lkg,dc:r.dc,gnThang:r.gnThang,thThang:r.thThang});
+      if(!current.ctr) current.ctr = r.name; // hiển thị nhà thầu đầu tiên ở dòng chính nếu chỉ có 1
+      else current.ctr = current.ctr+' & '+r.name;
     }
   });
   return result;
@@ -531,9 +480,7 @@ function go(){
     const tcm=tc==='ALL'||d.tc===tc;
     return tm&&tcm&&nm&&pm&&sm;
   });
-  // Cũng lọc TABLE_DATA (bảng cuối từ sheet "Tong hop") theo cùng tiêu chí
-  applyTableFilter();
-  renderAll(); // renderAll sẽ gọi renderTable() bên trong
+  renderAll();
 }
 
 /* ======= TIMELINE ======= */
@@ -578,8 +525,8 @@ function mkDonut(id,labels,data,cols,extraDs,showLabel){const C=window.Chart;if(
 function renderAll(){
   if(!window.Chart)return;
   const f=filtered;
-  let sV=0,sTH=0,sGN=0,sXL=0;
-  f.forEach(d=>{sV+=d.kv;sTH+=d.lkt;sGN+=d.lkg;sXL+=d.kxl;});
+  let sV=0,sTH=0,sGN=0,sXL=0,sGnThang=0,sThThang=0;
+  f.forEach(d=>{sV+=d.kxl;sTH+=d.lkt;sGN+=d.lkg;sXL+=d.kxl;sGnThang+=d.gnThang;sThThang+=d.thThang;});
   const rate=sXL>0?sGN/sXL*100:0;
   document.getElementById('kV').textContent=N(sV);
   document.getElementById('kTH').textContent=N(sTH);
@@ -588,31 +535,16 @@ function renderAll(){
   document.getElementById('kR').style.color=rate>60?'var(--gn)':rate>30?'var(--am)':'var(--rd)';
   document.getElementById('cnt').textContent=f.length+' công trình';
 
-  const months=['t1','t2','t3','t4','t5','t6'];
-  const thArrM=months.map(m=>+(f.reduce((s,d)=>s+d[m+'t'],0)/1000).toFixed(3));
-  const gnArrM=months.map(m=>+(f.reduce((s,d)=>s+d[m+'g'],0)/1000).toFixed(3));
-  const khArrM=months.map((m,i)=>+(f.reduce((s,d)=>s+d['kh'+(i+1)],0)/1000).toFixed(3));
-  // Gộp Tháng 1-2-3 → Quý I, Tháng 4-5-6 → Quý II
-  const q=arr=>[+(arr[0]+arr[1]+arr[2]).toFixed(3), +(arr[3]+arr[4]+arr[5]).toFixed(3)];
-  const thArr=q(thArrM), gnArr=q(gnArrM), khArr=q(khArrM);
-  const sKHLK=+(f.reduce((s,d)=>s+d.khlk,0)/1000).toFixed(2);
-  const hasKH=khArr.some(v=>v>0);
-  const barSetsM=hasKH?[
-    {l:'Kế hoạch (tỷ đồng)',d:khArr,bg:'rgba(251,191,36,0.55)',bc:'#fbbf24'},
-    {l:'Thực hiện (tỷ đồng)',d:thArr,bg:'rgba(96,165,250,0.7)',bc:'#60a5fa'},
-    {l:'Giải ngân (tỷ đồng)',d:gnArr,bg:'rgba(74,222,128,0.75)',bc:'#4ade80'}
-  ]:[
-    {l:'Thực hiện (tỷ đồng)',d:thArr,bg:'rgba(96,165,250,0.7)',bc:'#60a5fa'},
-    {l:'Giải ngân (tỷ đồng)',d:gnArr,bg:'rgba(74,222,128,0.75)',bc:'#4ade80'}
+  // Sheet "Tong hop" không có số liệu tách theo từng tháng (T1-T6), chỉ có nhu cầu vốn
+  // "cần thực hiện/giải ngân trong tháng" hiện tại → dùng 2 chỉ số này thay cho biểu đồ Quý I/Quý II.
+  const barSetsM=[
+    {l:'Giá trị cần thực hiện trong tháng (tỷ đồng)',d:[+sThThang.toFixed(2)],bg:'rgba(96,165,250,0.7)',bc:'#60a5fa'},
+    {l:'Giá trị cần giải ngân trong tháng (tỷ đồng)',d:[+sGnThang.toFixed(2)],bg:'rgba(74,222,128,0.75)',bc:'#4ade80'}
   ];
-  mkBar('cM',['Quý I (T1-T3)','Quý II (T4-T6)'],barSetsM);
-  const barSetsQ=sKHLK>0?[
-    {l:'Kế hoạch (tỷ đồng)',d:[sKHLK],bg:'rgba(251,191,36,0.55)',bc:'#fbbf24'},
-    {l:'Thực hiện lũy kế (tỷ đồng)',d:[+(sTH/1000).toFixed(2)],bg:'rgba(96,165,250,0.7)',bc:'#60a5fa'},
-    {l:'Giải ngân lũy kế (tỷ đồng)',d:[+(sGN/1000).toFixed(2)],bg:'rgba(74,222,128,0.75)',bc:'#4ade80'}
-  ]:[
-    {l:'Thực hiện lũy kế (tỷ đồng)',d:[+(sTH/1000).toFixed(2)],bg:'rgba(96,165,250,0.7)',bc:'#60a5fa'},
-    {l:'Giải ngân lũy kế (tỷ đồng)',d:[+(sGN/1000).toFixed(2)],bg:'rgba(74,222,128,0.75)',bc:'#4ade80'}
+  mkBar('cM',['Tháng hiện tại'],barSetsM);
+  const barSetsQ=[
+    {l:'Thực hiện lũy kế (tỷ đồng)',d:[+sTH.toFixed(2)],bg:'rgba(96,165,250,0.7)',bc:'#60a5fa'},
+    {l:'Giải ngân lũy kế (tỷ đồng)',d:[+sGN.toFixed(2)],bg:'rgba(74,222,128,0.75)',bc:'#4ade80'}
   ];
   mkBar('cQ',['Giá trị lũy kế'],barSetsQ);
   ['QL','TL'].forEach(type=>{
@@ -621,8 +553,8 @@ function renderAll(){
     const moi=f.filter(d=>d.tuyen===tuyen&&d.tc==='Khởi công mới');
     const total=ct.length+moi.length;
     document.getElementById('c'+type).textContent=total>0?total:'—';
-    const cGN=+(ct.reduce((s,d)=>s+d.lkg,0)/1000).toFixed(2);
-    const mGN=+(moi.reduce((s,d)=>s+d.lkg,0)/1000).toFixed(2);
+    const cGN=+(ct.reduce((s,d)=>s+d.lkg,0)).toFixed(2);
+    const mGN=+(moi.reduce((s,d)=>s+d.lkg,0)).toFixed(2);
     const hasData=total>0;
     const donutData=hasData?[ct.length,moi.length]:[1,0];
     const donutLabels=hasData?[`Chuyển tiếp (${ct.length} CT)`,`Khởi công mới (${moi.length} CT)`]:['Chưa có dữ liệu'];
@@ -632,38 +564,38 @@ function renderAll(){
   });
   const cMap={};f.forEach(d=>{
     if(d.breakdown&&d.breakdown.length){
-      d.breakdown.forEach(b=>{ if(b.ctr) cMap[b.ctr]=(cMap[b.ctr]||0)+(Number(b.kv)||0); });
+      d.breakdown.forEach(b=>{ if(b.ctr) cMap[b.ctr]=(cMap[b.ctr]||0)+(Number(b.kxl)||0); });
     } else if(d.ctr){
-      cMap[d.ctr]=(cMap[d.ctr]||0)+d.kv;
+      cMap[d.ctr]=(cMap[d.ctr]||0)+d.kxl;
     }
   });
-  mkDonut('dCtr',Object.keys(cMap),Object.values(cMap).map(v=>+(v/1000).toFixed(2)),CC8.slice(0,Object.keys(cMap).length),null,false);
+  mkDonut('dCtr',Object.keys(cMap),Object.values(cMap).map(v=>+v.toFixed(2)),CC8.slice(0,Object.keys(cMap).length),null,false);
   const tMap={},tcMap={};
-  f.forEach(d=>{tMap[d.tuyen]=(tMap[d.tuyen]||0)+d.kv;tcMap[d.tc]=(tcMap[d.tc]||0)+d.kv;});
-  mkDonut('dTuyen',Object.keys(tMap),Object.values(tMap).map(v=>+(v/1000).toFixed(2)),['#38bdf8','#34d399'],null,true);
+  f.forEach(d=>{tMap[d.tuyen]=(tMap[d.tuyen]||0)+d.kxl;tcMap[d.tc]=(tcMap[d.tc]||0)+d.kxl;});
+  mkDonut('dTuyen',Object.keys(tMap),Object.values(tMap).map(v=>+v.toFixed(2)),['#38bdf8','#34d399'],null,true);
   const tcColorMap={'Chuyển tiếp':'#22d3ee','Khởi công mới':'#f59e0b','Sửa chữa đột xuất':'#4ade80'};
-  mkDonut('dTC',Object.keys(tcMap),Object.values(tcMap).map(v=>+(v/1000).toFixed(2)),Object.keys(tcMap).map((k,i)=>tcColorMap[k]||CC8[i%CC8.length]),null,true);
+  mkDonut('dTC',Object.keys(tcMap),Object.values(tcMap).map(v=>+v.toFixed(2)),Object.keys(tcMap).map((k,i)=>tcColorMap[k]||CC8[i%CC8.length]),null,true);
 
-  renderTable();
-}
-
-/* ======= RENDER BẢNG CUỐI (dùng filteredTable từ sheet "Tong hop") ======= */
-function renderTable(){
-  const f = filteredTable.length > 0 ? filteredTable : filtered; // fallback nếu chưa load xong
   document.getElementById('tb').innerHTML=f.map((d,i)=>{
-    const ratioPct=d.khlk>0?Math.min(d.lkg/d.khlk*100,100):0;
-    const ratioColor=ratioPct<30?'#ef4444':ratioPct<70?'#fbbf24':'#4ade80';
-    const dv=Number(d.dc);
-    const dh=dv>0?`<span class="dc-box dp">+${dv.toFixed(1)}%</span>`:dv<0?`<span class="dc-box dn">${dv.toFixed(1)}%</span>`:`<span class="dc-box dz">0%</span>`;
-    const mainRow=`<tr><td style="color:var(--t3);font-weight:700;padding-top:9px">${i+1}</td><td class="nc">${d.name}</td><td style="padding-top:8px"><span class="badge ${d.tuyen==='Quốc lộ'?'bg-b':'bg-a'}">${d.tuyen}</span></td><td style="padding-top:8px"><span class="badge ${d.tc==='Chuyển tiếp'?'bg-a':'bg-g'}">${d.tc}</span></td><td style="padding-top:8px;min-width:100px;max-width:145px;word-break:break-word;font-size:10px">${d.ctr||'Mới khởi công'}</td><td class="tl-cell">${buildTimeline(d.kc,d.ht,d.st,d.lkt,d.hdXL,d.lkg,d.kxl,d.dp)}</td><td style="text-align:right;color:var(--pu);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.tmdt)}</td><td style="text-align:right;color:var(--or);padding-top:8px;font-size:14px;font-weight:900;border-left:1px solid rgba(10,77,90,.4)">${TyF(d.hdXL)}</td><td style="text-align:right;color:var(--t2);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.dp)}</td><td style="text-align:right;color:var(--bl);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.kxl)}</td><td style="text-align:right;color:#93c5fd;padding-top:8px;font-size:14px;font-weight:900">${TyF(d.lkt)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updTH)}</td><td style="text-align:right;color:var(--gn);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.lkg)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updGN)}</td><td style="padding-top:8px"><div style="display:flex;align-items:center;gap:5px;margin-top:3px"><div class="bt" style="height:7px"><div class="bf" style="width:${ratioPct.toFixed(0)}%;background:${ratioColor};height:7px"></div></div><span style="font-size:13px;font-weight:900;min-width:30px;text-align:right;color:${ratioColor}">${ratioPct.toFixed(0)}%</span></div></td><td style="text-align:center;padding-top:8px">${dh}</td></tr>`;
+    // dc = "Tỷ lệ giải ngân/kế hoạch giải ngân" lấy trực tiếp từ sheet Tong hop (đơn vị %)
+    const ratioPct=Math.max(0,Math.min(Number(d.dc)||0,100));
+    const ratioColor=(Number(d.dc)||0)<30?'#ef4444':(Number(d.dc)||0)<70?'#fbbf24':'#4ade80';
+    const ratioLbl=(Number(d.dc)||0).toFixed(0)+'%';
+    const gnT=Number(d.gnThang)||0, thT=Number(d.thThang)||0;
+    const gnTBox=gnT>0?`<span class="dc-box dp">+${gnT.toFixed(2)}</span>`:gnT<0?`<span class="dc-box dn">${gnT.toFixed(2)}</span>`:`<span class="dc-box dz">0</span>`;
+    const thTBox=thT>0?`<span class="dc-box dp">+${thT.toFixed(2)}</span>`:thT<0?`<span class="dc-box dn">${thT.toFixed(2)}</span>`:`<span class="dc-box dz">0</span>`;
+    const mainRow=`<tr><td style="color:var(--t3);font-weight:700;padding-top:9px">${i+1}</td><td class="nc">${d.name}</td><td style="padding-top:8px"><span class="badge ${d.tuyen==='Quốc lộ'?'bg-b':'bg-a'}">${d.tuyen}</span></td><td style="padding-top:8px"><span class="badge ${d.tc==='Chuyển tiếp'?'bg-a':'bg-g'}">${d.tc}</span></td><td style="padding-top:8px;min-width:100px;max-width:145px;word-break:break-word;font-size:10px">${d.ctr||'Mới khởi công'}</td><td class="tl-cell">${buildTimeline(d.kc,d.ht,d.st,d.lkt,d.hdXL,d.lkg,d.kxl,d.dp)}</td><td style="text-align:right;color:var(--pu);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.tmdt)}</td><td style="text-align:right;color:var(--or);padding-top:8px;font-size:14px;font-weight:900;border-left:1px solid rgba(10,77,90,.4)">${TyF(d.hdXL)}</td><td style="text-align:right;color:var(--t2);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.dp)}</td><td style="text-align:right;color:var(--bl);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.kxl)}</td><td style="text-align:right;color:#93c5fd;padding-top:8px;font-size:14px;font-weight:900">${TyF(d.lkt)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updTH)}</td><td style="text-align:right;color:var(--gn);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.lkg)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updGN)}</td><td style="padding-top:8px"><div style="display:flex;align-items:center;gap:5px;margin-top:3px"><div class="bt" style="height:7px"><div class="bf" style="width:${ratioPct.toFixed(0)}%;background:${ratioColor};height:7px"></div></div><span style="font-size:13px;font-weight:900;min-width:30px;text-align:right;color:${ratioColor}">${ratioLbl}</span></div></td><td style="text-align:right;padding-top:8px">${gnTBox}</td><td style="text-align:right;padding-top:8px">${thTBox}</td></tr>`;
     const subRows=(d.breakdown&&d.breakdown.length)?d.breakdown.map((b,j)=>{
-      const bhdXL=Number(b.hdXL)||0,bdp=Number(b.dp)||0,bkxl=Number(b.kxl)||0,blkt=Number(b.lkt)||0,blkg=Number(b.lkg)||0,bkhlk=Number(b.khlk)||0;
+      const bhdXL=Number(b.hdXL)||0,bdp=Number(b.dp)||0,bkxl=Number(b.kxl)||0,blkt=Number(b.lkt)||0,blkg=Number(b.lkg)||0,bdc=Number(b.dc)||0;
       const bTongHD=bhdXL+bdp;
       const bThLkPct=bTongHD>0?Math.min(blkt/bTongHD*100,100):0;
       const bGnKhXlPct=bkxl>0?Math.min(blkg/bkxl*100,100):0;
-      const bRatioPct=bkhlk>0?Math.min(blkg/bkhlk*100,100):0;
-      const bRatioColor=bRatioPct<30?'#ef4444':bRatioPct<70?'#fbbf24':'#4ade80';
-      return `<tr style="background:rgba(255,255,255,.02)"><td style="color:var(--t3);font-weight:700;padding-top:8px;font-size:10px">${i+1}.${j+1}</td><td class="nc" style="font-size:11px;color:var(--t2);font-style:italic">↳ Chi tiết nhà thầu: ${b.ctr||'—'}</td><td></td><td></td><td style="padding-top:8px;min-width:100px;max-width:145px;word-break:break-word;font-size:10px;color:var(--t3)">—</td><td class="tl-cell"><div class="tl-wrap">${bTongHD>0?`<div class="tl-bar-bg" style="height:9px"><div class="tl-bar-fill" style="width:${bThLkPct.toFixed(0)}%;background:#fb923c;height:9px"></div></div><div class="tl-info" style="color:#fb923c;font-size:11px;font-weight:800;margin-top:2px">🟧 Giá trị thực hiện lũy kế/Hợp đồng xây lắp: ${bThLkPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkt)}/${TyF(bTongHD)} tỷ)</span></div>`:''}${bkxl>0?`<div class="tl-bar-bg" style="height:9px;margin-top:4px"><div class="tl-bar-fill" style="width:${bGnKhXlPct.toFixed(0)}%;background:#60a5fa;height:9px"></div></div><div class="tl-info" style="color:#60a5fa;font-size:11px;font-weight:800;margin-top:2px">🟦 Giá trị giải ngân lũy kế/Kế hoạch vốn xây lắp: ${bGnKhXlPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkg)}/${TyF(bkxl)} tỷ)</span></div>`:''}</div></td><td style="text-align:right;color:var(--t3);padding-top:8px">—</td><td style="text-align:right;color:var(--or);padding-top:8px;font-size:13px;font-weight:900;border-left:1px solid rgba(10,77,90,.4)">${TyF(bhdXL)}</td><td style="text-align:right;color:var(--t2);padding-top:8px;font-size:13px;font-weight:900">${TyF(bdp)}</td><td style="text-align:right;color:var(--bl);padding-top:8px;font-size:13px;font-weight:900">${TyF(bkxl)}</td><td style="text-align:right;color:#93c5fd;padding-top:8px;font-size:13px;font-weight:900">${TyF(blkt)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updTH)}</td><td style="text-align:right;color:var(--gn);padding-top:8px;font-size:13px;font-weight:900">${TyF(blkg)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updGN)}</td><td style="padding-top:8px">${bkhlk>0?`<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><div class="bt" style="height:7px"><div class="bf" style="width:${bRatioPct.toFixed(0)}%;background:${bRatioColor};height:7px"></div></div><span style="font-size:12px;font-weight:900;min-width:28px;text-align:right;color:${bRatioColor}">${bRatioPct.toFixed(0)}%</span></div>`:'<span style="color:var(--t3);font-size:10px">—</span>'}</td><td style="text-align:center;padding-top:8px;color:var(--t3)">—</td></tr>`;
+      const bRatioPct=Math.max(0,Math.min(bdc,100));
+      const bRatioColor=bdc<30?'#ef4444':bdc<70?'#fbbf24':'#4ade80';
+      const bgnT=Number(b.gnThang)||0, bthT=Number(b.thThang)||0;
+      const bgnTBox=bgnT>0?`<span class="dc-box dp">+${bgnT.toFixed(2)}</span>`:bgnT<0?`<span class="dc-box dn">${bgnT.toFixed(2)}</span>`:`<span class="dc-box dz">0</span>`;
+      const bthTBox=bthT>0?`<span class="dc-box dp">+${bthT.toFixed(2)}</span>`:bthT<0?`<span class="dc-box dn">${bthT.toFixed(2)}</span>`:`<span class="dc-box dz">0</span>`;
+      return `<tr style="background:rgba(255,255,255,.02)"><td style="color:var(--t3);font-weight:700;padding-top:8px;font-size:10px">${i+1}.${j+1}</td><td class="nc" style="font-size:11px;color:var(--t2);font-style:italic">↳ Chi tiết nhà thầu: ${b.ctr||'—'}</td><td></td><td></td><td style="padding-top:8px;min-width:100px;max-width:145px;word-break:break-word;font-size:10px;color:var(--t3)">—</td><td class="tl-cell"><div class="tl-wrap">${bTongHD>0?`<div class="tl-bar-bg" style="height:9px"><div class="tl-bar-fill" style="width:${bThLkPct.toFixed(0)}%;background:#fb923c;height:9px"></div></div><div class="tl-info" style="color:#fb923c;font-size:11px;font-weight:800;margin-top:2px">🟧 Giá trị thực hiện lũy kế/Hợp đồng xây lắp: ${bThLkPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkt)}/${TyF(bTongHD)} tỷ)</span></div>`:''}${bkxl>0?`<div class="tl-bar-bg" style="height:9px;margin-top:4px"><div class="tl-bar-fill" style="width:${bGnKhXlPct.toFixed(0)}%;background:#60a5fa;height:9px"></div></div><div class="tl-info" style="color:#60a5fa;font-size:11px;font-weight:800;margin-top:2px">🟦 Giá trị giải ngân lũy kế/Kế hoạch vốn xây lắp: ${bGnKhXlPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkg)}/${TyF(bkxl)} tỷ)</span></div>`:''}</div></td><td style="text-align:right;color:var(--t3);padding-top:8px">—</td><td style="text-align:right;color:var(--or);padding-top:8px;font-size:13px;font-weight:900;border-left:1px solid rgba(10,77,90,.4)">${TyF(bhdXL)}</td><td style="text-align:right;color:var(--t2);padding-top:8px;font-size:13px;font-weight:900">${TyF(bdp)}</td><td style="text-align:right;color:var(--bl);padding-top:8px;font-size:13px;font-weight:900">${TyF(bkxl)}</td><td style="text-align:right;color:#93c5fd;padding-top:8px;font-size:13px;font-weight:900">${TyF(blkt)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updTH)}</td><td style="text-align:right;color:var(--gn);padding-top:8px;font-size:13px;font-weight:900">${TyF(blkg)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updGN)}</td><td style="padding-top:8px">${bdc?`<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><div class="bt" style="height:7px"><div class="bf" style="width:${bRatioPct.toFixed(0)}%;background:${bRatioColor};height:7px"></div></div><span style="font-size:12px;font-weight:900;min-width:28px;text-align:right;color:${bRatioColor}">${bdc.toFixed(0)}%</span></div>`:'<span style="color:var(--t3);font-size:10px">—</span>'}</td><td style="text-align:right;padding-top:8px">${bgnTBox}</td><td style="text-align:right;padding-top:8px">${bthTBox}</td></tr>`;
     }).join(''):'';
     return mainRow+subRows;
   }).join('');
