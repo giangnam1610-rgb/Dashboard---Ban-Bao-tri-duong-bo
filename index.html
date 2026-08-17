@@ -47,8 +47,8 @@ tr:hover td{background:rgba(34,211,238,.04)}
 .stb{font-size:8px;font-weight:800;text-transform:uppercase;color:var(--cy);border-bottom:1px solid var(--bd);padding-bottom:6px;margin-bottom:9px}
 .tl-wrap{display:flex;flex-direction:column;gap:3px;width:100%}
 .tl-dates{display:flex;justify-content:space-between;font-size:8px;font-weight:700}
-.tl-bar-bg{width:100%;height:6px;background:#0d2d38;border-radius:9999px;overflow:hidden;position:relative}
-.tl-bar-fill{height:6px;border-radius:9999px;position:absolute;left:0;top:0}
+.tl-bar-bg{width:100%;height:7px;background:#0d2d38;border-radius:9999px;overflow:hidden;position:relative}
+.tl-bar-fill{height:7px;border-radius:9999px;position:absolute;left:0;top:0}
 .tl-info{font-size:8px;font-weight:800;text-align:center;margin-top:2px}
 .tl-chuathi{display:flex;align-items:center;justify-content:center;padding:3px 7px;border-radius:6px;background:rgba(50,60,70,.4);border:1px solid rgba(100,116,139,.3);font-size:9px;font-weight:700;color:#94a3b8}
 .tl-cell{min-width:290px;text-align:center;vertical-align:middle !important;padding:9px}
@@ -176,7 +176,7 @@ tr:hover td{background:rgba(34,211,238,.04)}
 
 <!-- CHARTS -->
 <div class="g2">
-  <div class="card" style="padding:12px"><div class="st">📊 Nhu cầu vốn cần Thực hiện/Giải ngân trong tháng</div><div style="height:260px;position:relative"><canvas id="cM"></canvas></div></div>
+  <div class="card" style="padding:12px"><div class="st">📊 Giá trị cần Thực hiện/Giải ngân trong tháng</div><div style="height:260px;position:relative"><canvas id="cM"></canvas></div></div>
   <div class="card" style="padding:12px"><div class="st">📈 Thực hiện & Giải ngân Lũy kế</div><div style="height:260px;position:relative"><canvas id="cQ"></canvas></div></div>
 </div>
 <div class="g3">
@@ -195,7 +195,7 @@ tr:hover td{background:rgba(34,211,238,.04)}
   <div style="overflow-x:auto;max-height:500px;overflow-y:auto">
     <table><thead><tr>
       <th rowspan="2">#</th><th rowspan="2">Tên công trình</th><th rowspan="2">Tuyến</th><th rowspan="2">Tính chất</th><th rowspan="2">Nhà thầu</th>
-      <th rowspan="2" style="min-width:280px;text-align:center">Thời gian thực hiện dự án - Giá trị thực hiện/Giá trị hợp đồng</th>
+      <th rowspan="2" style="min-width:280px;text-align:center">Thời gian thực hiện dự án</th>
       <th rowspan="2" style="text-align:right">TMĐT<br><span style="color:var(--t3)">(tỷ)</span></th>
       <th colspan="2" style="text-align:center;border-left:1px solid var(--bd);white-space:normal;max-width:120px">Giá trị Hợp đồng/PLHĐ</th>
       <th rowspan="2" style="text-align:right;white-space:normal;max-width:90px">Kế hoạch vốn xây lắp<br><span style="color:var(--t3)">(tỷ)</span></th>
@@ -311,30 +311,27 @@ async function fetchData(){
 /* ======= PARSE GVIZ JSON ======= */
 function norm(s){return (s||'').toString().trim().replace(/\s+/g,' ');}
 
-// Chuyển giá trị gviz thành chuỗi dd/mm/yyyy
+// Chuyển giá trị gviz thành chuỗi dd/mm/yyyy, đúng như hiển thị trên sheet "Tong hop"
 function gvizToDate(cell){
   if(!cell||cell.v==null) return '';
-  // Nếu có formatted value (f) và trông giống ngày → dùng luôn
-  if(cell.f){
-    const f=cell.f.trim();
-    // Đã đúng dạng dd/mm/yyyy hoặc d/m/yyyy
-    if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(f)) return f;
-    // Dạng mm/dd/yyyy (kiểu Mỹ) → đảo lại
-    if(/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(f)){
-      const p=f.split('/');return p[1]+'/'+p[0]+'/'+p[2];
-    }
-  }
-  // .v dạng "Date(yyyy,m,d)" — tháng bắt đầu từ 0
   const v=String(cell.v);
-  const dm=v.match(/Date\((\d+),(\d+),(\d+)\)/);
+  // 1) .v dạng "Date(yyyy,m,d)" — kiểu ngày chuẩn gviz trả về khi ô được định dạng Date trong Sheets.
+  //    Ưu tiên cao nhất vì đây là giá trị ngày thật, không phụ thuộc định dạng hiển thị (locale) của sheet.
+  const dm=v.match(/Date\((\d+),\s*(\d+),\s*(\d+)/);
   if(dm){
     const y=dm[1],m=parseInt(dm[2])+1,d=dm[3];
     return d+'/'+m+'/'+y;
   }
-  // .v là chuỗi ngày tháng dạng yyyy-mm-dd
+  // 2) Formatted value (f) — lấy đúng phần dd/mm/yyyy ở đầu chuỗi (bỏ qua giờ:phút nếu có)
+  if(cell.f){
+    const f=cell.f.trim();
+    const m1=f.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if(m1) return m1[1]+'/'+m1[2]+'/'+m1[3];
+  }
+  // 3) .v là chuỗi ngày tháng dạng yyyy-mm-dd (ISO)
   const iso=v.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if(iso) return iso[3]+'/'+iso[2]+'/'+iso[1];
-  // .v là số serial ngày kiểu Google Sheets (số ngày kể từ 30/12/1899)
+  // 4) .v là số serial ngày kiểu Google Sheets (số ngày kể từ 30/12/1899)
   // Chỉ chấp nhận trong khoảng hợp lý (~năm 1950 - 2100), tránh hiện số rác khi ô bị lệch cột/sai dữ liệu
   if(/^-?\d+(\.\d+)?$/.test(v)){
     const num=parseFloat(v);
@@ -345,8 +342,8 @@ function gvizToDate(cell){
     }
     return ''; // Số không hợp lệ làm ngày → bỏ trống thay vì hiện số rác
   }
-  // Fallback: trả về nguyên bản
-  return norm(v);
+  // Không nhận diện được dạng ngày hợp lệ → bỏ trống thay vì hiện nguyên giá trị gốc (tránh hiện số/chữ rác)
+  return '';
 }
 
 function deAccent(s){
@@ -427,7 +424,8 @@ function parseGviz(json){
       kc:gDate('kc'),  // dùng gvizToDate thay vì g()
       ht:gDate('ht'),  // dùng gvizToDate thay vì g()
       // Sheet "Tong hop" đang ở đơn vị triệu đồng → quy đổi /1000 để ra tỷ đồng (giống sheet cũ)
-      tmdt:n('tmdt')/1000,hdXL:n('hdXL')/1000,dp:n('dp')/1000,kxl:n('kxl')/1000,lkt:n('lkt')/1000,lkg:n('lkg')/1000,dc:n('dc'),st,
+      // Cột "Tỷ lệ GN/KH GN" trong sheet định dạng %, gviz trả .v ở dạng phân số (vd 0.6 = 60%) → nhân 100
+      tmdt:n('tmdt')/1000,hdXL:n('hdXL')/1000,dp:n('dp')/1000,kxl:n('kxl')/1000,lkt:n('lkt')/1000,lkg:n('lkg')/1000,dc:n('dc')*100,st,
       updTH:gDate('updTH'),updGN:gDate('updGN'),
       gnThang:n('gnThang')/1000,thThang:n('thThang')/1000};
   });
@@ -511,8 +509,8 @@ function buildTimeline(kc,ht,status,lkt,hdXL,lkg,kxl,dp){
   const gnPct=tongHD>0?Math.min(lktV/tongHD*100,100):0;
   const gnBarWidth=isDone?100:gnPct;
   const khXlPct=kxlV>0?Math.min(lkgV/kxlV*100,100):0;
-  const orangeBar=tongHD>0?`<div class="tl-bar-bg" style="margin-top:4px;height:9px"><div class="tl-bar-fill" style="width:${gnBarWidth.toFixed(0)}%;background:#fb923c;height:9px"></div></div><div class="tl-info" style="color:#fb923c;font-size:12px;font-weight:800;margin-top:3px">🟧 Giá trị thực hiện lũy kế/Hợp đồng xây lắp: ${gnPct.toFixed(0)}% <span style="font-size:11px;font-weight:900;color:#fff">(${TyF(lktV)}/${TyF(tongHD)} tỷ)</span></div>`:'';
-  const blueBar=kxlV>0?`<div class="tl-bar-bg" style="margin-top:4px;height:9px"><div class="tl-bar-fill" style="width:${khXlPct.toFixed(0)}%;background:#60a5fa;height:9px"></div></div><div class="tl-info" style="color:#60a5fa;font-size:12px;font-weight:800;margin-top:3px">🟦 Giá trị giải ngân lũy kế/Kế hoạch vốn xây lắp: ${khXlPct.toFixed(0)}% <span style="font-size:11px;font-weight:900;color:#fff">(${TyF(lkgV)}/${TyF(kxlV)} tỷ)</span></div>`:'';
+  const orangeBar=tongHD>0?`<div class="tl-bar-bg" style="margin-top:4px;height:7px"><div class="tl-bar-fill" style="width:${gnBarWidth.toFixed(0)}%;background:#fb923c;height:7px"></div></div><div class="tl-info" style="color:#fb923c;font-size:12px;font-weight:800;margin-top:3px">🟧 Tiến độ thực hiện: ${gnPct.toFixed(0)}% <span style="font-size:11px;font-weight:900;color:#fff">(${TyF(lktV)}/${TyF(tongHD)} tỷ)</span></div>`:'';
+  const blueBar=kxlV>0?`<div class="tl-bar-bg" style="margin-top:4px;height:7px"><div class="tl-bar-fill" style="width:${khXlPct.toFixed(0)}%;background:#60a5fa;height:7px"></div></div><div class="tl-info" style="color:#60a5fa;font-size:12px;font-weight:800;margin-top:3px">🟦 Tỷ lệ giải ngân: ${khXlPct.toFixed(0)}% <span style="font-size:11px;font-weight:900;color:#fff">(${TyF(lkgV)}/${TyF(kxlV)} tỷ)</span></div>`:'';
   const gnBar=orangeBar+blueBar;
   // Nếu không có status nhưng đã có ngày KC/HT (do override) → vẫn render timeline
   if(!status && (!kcd||!htd)) return `<div class="tl-wrap" style="align-items:center"><div class="tl-chuathi">⏸ Mới khởi công</div>${gnBar}</div>`;
@@ -611,7 +609,7 @@ function renderAll(){
       const bgnT=Number(b.gnThang)||0, bthT=Number(b.thThang)||0;
       const bgnTBox=bgnT>0?`<span class="dc-box dp">+${bgnT.toFixed(2)}</span>`:bgnT<0?`<span class="dc-box dn">${bgnT.toFixed(2)}</span>`:`<span class="dc-box dz">0</span>`;
       const bthTBox=bthT>0?`<span class="dc-box dp">+${bthT.toFixed(2)}</span>`:bthT<0?`<span class="dc-box dn">${bthT.toFixed(2)}</span>`:`<span class="dc-box dz">0</span>`;
-      return `<tr style="background:rgba(255,255,255,.02)"><td style="color:var(--t3);font-weight:700;padding-top:8px;font-size:10px">${i+1}.${j+1}</td><td class="nc" style="font-size:11px;color:var(--t2);font-style:italic">↳ Chi tiết nhà thầu: ${b.ctr||'—'}</td><td></td><td></td><td style="padding-top:8px;min-width:100px;max-width:145px;word-break:break-word;font-size:10px;color:var(--t3)">—</td><td class="tl-cell"><div class="tl-wrap">${bTongHD>0?`<div class="tl-bar-bg" style="height:9px"><div class="tl-bar-fill" style="width:${bThLkPct.toFixed(0)}%;background:#fb923c;height:9px"></div></div><div class="tl-info" style="color:#fb923c;font-size:11px;font-weight:800;margin-top:2px">🟧 Giá trị thực hiện lũy kế/Hợp đồng xây lắp: ${bThLkPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkt)}/${TyF(bTongHD)} tỷ)</span></div>`:''}${bkxl>0?`<div class="tl-bar-bg" style="height:9px;margin-top:4px"><div class="tl-bar-fill" style="width:${bGnKhXlPct.toFixed(0)}%;background:#60a5fa;height:9px"></div></div><div class="tl-info" style="color:#60a5fa;font-size:11px;font-weight:800;margin-top:2px">🟦 Giá trị giải ngân lũy kế/Kế hoạch vốn xây lắp: ${bGnKhXlPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkg)}/${TyF(bkxl)} tỷ)</span></div>`:''}</div></td><td style="text-align:right;color:var(--t3);padding-top:8px">—</td><td style="text-align:right;color:var(--or);padding-top:8px;font-size:13px;font-weight:900;border-left:1px solid rgba(10,77,90,.4)">${TyF(bhdXL)}</td><td style="text-align:right;color:var(--t2);padding-top:8px;font-size:13px;font-weight:900">${TyF(bdp)}</td><td style="text-align:right;color:var(--bl);padding-top:8px;font-size:13px;font-weight:900">${TyF(bkxl)}</td><td style="text-align:right;color:#93c5fd;padding-top:8px;font-size:13px;font-weight:900">${TyF(blkt)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updTH)}</td><td style="text-align:right;color:var(--gn);padding-top:8px;font-size:13px;font-weight:900">${TyF(blkg)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updGN)}</td><td style="padding-top:8px">${bdc?`<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><div class="bt" style="height:7px"><div class="bf" style="width:${bRatioPct.toFixed(0)}%;background:${bRatioColor};height:7px"></div></div><span style="font-size:12px;font-weight:900;min-width:28px;text-align:right;color:${bRatioColor}">${bdc.toFixed(0)}%</span></div>`:'<span style="color:var(--t3);font-size:10px">—</span>'}</td><td style="text-align:right;padding-top:8px">${bgnTBox}</td><td style="text-align:right;padding-top:8px">${bthTBox}</td></tr>`;
+      return `<tr style="background:rgba(255,255,255,.02)"><td style="color:var(--t3);font-weight:700;padding-top:8px;font-size:10px">${i+1}.${j+1}</td><td class="nc" style="font-size:11px;color:var(--t2);font-style:italic">↳ Chi tiết nhà thầu: ${b.ctr||'—'}</td><td></td><td></td><td style="padding-top:8px;min-width:100px;max-width:145px;word-break:break-word;font-size:10px;color:var(--t3)">—</td><td class="tl-cell"><div class="tl-wrap">${bTongHD>0?`<div class="tl-bar-bg" style="height:7px"><div class="tl-bar-fill" style="width:${bThLkPct.toFixed(0)}%;background:#fb923c;height:7px"></div></div><div class="tl-info" style="color:#fb923c;font-size:11px;font-weight:800;margin-top:2px">🟧 Tiến độ thực hiện: ${bThLkPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkt)}/${TyF(bTongHD)} tỷ)</span></div>`:''}${bkxl>0?`<div class="tl-bar-bg" style="height:7px;margin-top:4px"><div class="tl-bar-fill" style="width:${bGnKhXlPct.toFixed(0)}%;background:#60a5fa;height:7px"></div></div><div class="tl-info" style="color:#60a5fa;font-size:11px;font-weight:800;margin-top:2px">🟦 Tỷ lệ giải ngân: ${bGnKhXlPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkg)}/${TyF(bkxl)} tỷ)</span></div>`:''}</div></td><td style="text-align:right;color:var(--t3);padding-top:8px">—</td><td style="text-align:right;color:var(--or);padding-top:8px;font-size:13px;font-weight:900;border-left:1px solid rgba(10,77,90,.4)">${TyF(bhdXL)}</td><td style="text-align:right;color:var(--t2);padding-top:8px;font-size:13px;font-weight:900">${TyF(bdp)}</td><td style="text-align:right;color:var(--bl);padding-top:8px;font-size:13px;font-weight:900">${TyF(bkxl)}</td><td style="text-align:right;color:#93c5fd;padding-top:8px;font-size:13px;font-weight:900">${TyF(blkt)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updTH)}</td><td style="text-align:right;color:var(--gn);padding-top:8px;font-size:13px;font-weight:900">${TyF(blkg)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updGN)}</td><td style="padding-top:8px">${bdc?`<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><div class="bt" style="height:7px"><div class="bf" style="width:${bRatioPct.toFixed(0)}%;background:${bRatioColor};height:7px"></div></div><span style="font-size:12px;font-weight:900;min-width:28px;text-align:right;color:${bRatioColor}">${bdc.toFixed(0)}%</span></div>`:'<span style="color:var(--t3);font-size:10px">—</span>'}</td><td style="text-align:right;padding-top:8px">${bgnTBox}</td><td style="text-align:right;padding-top:8px">${bthTBox}</td></tr>`;
     }).join(''):'';
     return mainRow+subRows;
   }).join('');
