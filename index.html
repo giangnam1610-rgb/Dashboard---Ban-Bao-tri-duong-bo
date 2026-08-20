@@ -86,11 +86,7 @@ tr:hover td{background:rgba(34,211,238,.04)}
   .kpi{padding:9px}
   .kpi .v{font-size:16px}
   h1{font-size:11px !important;line-height:1.4}
-  /* Header: bỏ absolute-position để không đè lên tiêu đề khi xuống dòng */
-  #hdrTop{position:relative;padding-top:8px}
-  #hdrLeft,#hdrRight{position:static !important;justify-content:center;flex-wrap:wrap;margin-top:6px}
-  #hdrLeft{display:flex}
-  #hdrRight{display:flex}
+  #hdrLeft,#hdrRight{justify-content:center}
   .donut-lg{height:190px}
   .donut-wrap{height:170px}
   .tl-cell{min-width:230px}
@@ -106,6 +102,22 @@ tr:hover td{background:rgba(34,211,238,.04)}
   .col-map{grid-template-columns:1fr}
   .author-badge span{white-space:normal}
   .st{flex-wrap:wrap;gap:6px}
+}
+/* Điện thoại xoay ngang: màn thấp nhưng rộng hơn → tận dụng chiều rộng, giảm khoảng đệm dọc */
+@media (max-height:500px) and (orientation:landscape){
+  .wrap{padding:6px 12px}
+  #hdrTop{padding-bottom:7px}
+  h1{font-size:10px !important}
+  #hdrTop p{margin-top:1px}
+  .g5{grid-template-columns:repeat(5,1fr)}
+  .g4{grid-template-columns:repeat(4,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:1fr 1fr}
+  .kpi{padding:7px}
+  .kpi .v{font-size:15px}
+  .kpi p{margin-bottom:2px}
+  .donut-lg{height:150px}
+  .donut-wrap{height:140px}
 }
 </style>
 </head>
@@ -174,22 +186,24 @@ tr:hover td{background:rgba(34,211,238,.04)}
 </div>
 
 <!-- HEADER -->
-<div id="hdrTop" style="text-align:center;border-bottom:1px solid var(--bd);padding-bottom:12px;position:relative">
+<div id="hdrTop" style="text-align:center;border-bottom:1px solid var(--bd);padding-bottom:12px">
   <h1 style="font-size:13px;font-weight:800;letter-spacing:.08em;color:var(--cy);text-transform:uppercase">HỆ THỐNG THEO DÕI QUẢN LÝ DỰ ÁN SỬA CHỮA ĐỊNH KỲ - SỬA CHỮA ĐỘT XUẤT NĂM 2026</h1>
   <p style="font-size:9px;color:var(--t2);font-weight:700;margin-top:3px">Ban Bảo trì đường bộ - Sở Xây dựng – tỉnh Điện Biên</p>
-  <div id="hdrLeft" style="position:absolute;top:0;left:0;display:flex;align-items:center;gap:8px">
-    <span class="ping" style="background:var(--gn)"></span>
-    <span id="ctCount" style="font-size:9px;font-weight:700;color:var(--gn)">Chờ kết nối...</span>
-    <div class="refresh-badge"><span class="ping" style="background:var(--cy);animation-duration:3s"></span><span id="nextRefresh">Live · 5 phút</span></div>
-  </div>
-  <div id="hdrRight" style="position:absolute;top:0;right:0;display:flex;align-items:center;gap:6px">
-    <div class="status-bar">
-      <span id="syncStatus" class="status-loading">⏳ Chờ cấu hình</span>
-      <span id="lastSync" style="color:var(--t3)"></span>
+  <div style="display:flex;justify-content:center;align-items:center;flex-wrap:wrap;gap:10px;margin-top:9px">
+    <div id="hdrLeft" style="display:flex;align-items:center;flex-wrap:wrap;gap:8px">
+      <span class="ping" style="background:var(--gn)"></span>
+      <span id="ctCount" style="font-size:9px;font-weight:700;color:var(--gn)">Chờ kết nối...</span>
+      <div class="refresh-badge"><span class="ping" style="background:var(--cy);animation-duration:3s"></span><span id="nextRefresh">Live · 5 phút</span></div>
     </div>
-    <button class="btn btn-cy" onclick="fetchData()" style="font-size:9px;padding:4px 10px">↻ Refresh</button>
-    <button class="btn" style="background:var(--bd2);color:var(--tx);font-size:9px;padding:4px 10px" onclick="openCfg()">⚙ Cấu hình</button>
-    <div class="author-badge"><div class="dot"></div><span>Người thực hiện: <strong>Trần Việt Đức</strong> – <strong>Bùi Giang Nam</strong></span></div>
+    <div id="hdrRight" style="display:flex;align-items:center;flex-wrap:wrap;gap:6px">
+      <div class="status-bar">
+        <span id="syncStatus" class="status-loading">⏳ Chờ cấu hình</span>
+        <span id="lastSync" style="color:var(--t3)"></span>
+      </div>
+      <button class="btn btn-cy" onclick="fetchData()" style="font-size:9px;padding:4px 10px">↻ Refresh</button>
+      <button class="btn" style="background:var(--bd2);color:var(--tx);font-size:9px;padding:4px 10px" onclick="openCfg()">⚙ Cấu hình</button>
+      <div class="author-badge"><div class="dot"></div><span>Người thực hiện: <strong>Trần Việt Đức</strong> – <strong>Bùi Giang Nam</strong></span></div>
+    </div>
   </div>
 </div>
 
