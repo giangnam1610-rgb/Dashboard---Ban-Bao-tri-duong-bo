@@ -71,6 +71,42 @@ tr:hover td{background:rgba(34,211,238,.04)}
 .refresh-badge{display:flex;align-items:center;gap:5px;background:rgba(34,211,238,.06);border:1px solid rgba(34,211,238,.2);border-radius:5px;padding:3px 8px;font-size:9px;font-weight:700;color:var(--t3)}
 .status-bar{display:flex;align-items:center;gap:8px;font-size:9px;font-weight:700}
 .status-ok{color:var(--gn)}.status-err{color:var(--rd)}.status-loading{color:var(--am)}
+
+/* ===== RESPONSIVE / MOBILE ===== */
+@media (max-width:1024px){
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:1fr 1fr}
+}
+@media (max-width:768px){
+  .wrap{padding:9px}
+  .g5{grid-template-columns:repeat(2,1fr)}
+  .g4{grid-template-columns:repeat(2,1fr)}
+  .g3{grid-template-columns:1fr}
+  .g2{grid-template-columns:1fr}
+  .kpi{padding:9px}
+  .kpi .v{font-size:16px}
+  h1{font-size:11px !important;line-height:1.4}
+  /* Header: bỏ absolute-position để không đè lên tiêu đề khi xuống dòng */
+  #hdrTop{position:relative;padding-top:8px}
+  #hdrLeft,#hdrRight{position:static !important;justify-content:center;flex-wrap:wrap;margin-top:6px}
+  #hdrLeft{display:flex}
+  #hdrRight{display:flex}
+  .donut-lg{height:190px}
+  .donut-wrap{height:170px}
+  .tl-cell{min-width:230px}
+}
+@media (max-width:480px){
+  .wrap{padding:6px}
+  .g5{grid-template-columns:1fr}
+  .g4{grid-template-columns:1fr}
+  body{font-size:11px}
+  h1{font-size:10px !important}
+  .kpi .v{font-size:15px}
+  .cfg-panel{padding:14px}
+  .col-map{grid-template-columns:1fr}
+  .author-badge span{white-space:normal}
+  .st{flex-wrap:wrap;gap:6px}
+}
 </style>
 </head>
 <body>
@@ -138,15 +174,15 @@ tr:hover td{background:rgba(34,211,238,.04)}
 </div>
 
 <!-- HEADER -->
-<div style="text-align:center;border-bottom:1px solid var(--bd);padding-bottom:12px;position:relative">
+<div id="hdrTop" style="text-align:center;border-bottom:1px solid var(--bd);padding-bottom:12px;position:relative">
   <h1 style="font-size:13px;font-weight:800;letter-spacing:.08em;color:var(--cy);text-transform:uppercase">HỆ THỐNG THEO DÕI QUẢN LÝ DỰ ÁN SỬA CHỮA ĐỊNH KỲ - SỬA CHỮA ĐỘT XUẤT NĂM 2026</h1>
   <p style="font-size:9px;color:var(--t2);font-weight:700;margin-top:3px">Ban Bảo trì đường bộ - Sở Xây dựng – tỉnh Điện Biên</p>
-  <div style="position:absolute;top:0;left:0;display:flex;align-items:center;gap:8px">
+  <div id="hdrLeft" style="position:absolute;top:0;left:0;display:flex;align-items:center;gap:8px">
     <span class="ping" style="background:var(--gn)"></span>
     <span id="ctCount" style="font-size:9px;font-weight:700;color:var(--gn)">Chờ kết nối...</span>
     <div class="refresh-badge"><span class="ping" style="background:var(--cy);animation-duration:3s"></span><span id="nextRefresh">Live · 5 phút</span></div>
   </div>
-  <div style="position:absolute;top:0;right:0;display:flex;align-items:center;gap:6px">
+  <div id="hdrRight" style="position:absolute;top:0;right:0;display:flex;align-items:center;gap:6px">
     <div class="status-bar">
       <span id="syncStatus" class="status-loading">⏳ Chờ cấu hình</span>
       <span id="lastSync" style="color:var(--t3)"></span>
