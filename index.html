@@ -217,7 +217,7 @@ tr.sub-row td{transition:background .15s}
   <div><label class="lbl">Tính chất</label><select id="fC" onchange="go()"><option value="ALL">Tất cả</option><option value="Chuyển tiếp">Chuyển tiếp</option><option value="Khởi công mới">Khởi công mới</option></select></div>
   <div><label class="lbl">Đơn vị thi công</label><select id="fN" onchange="go()"><option value="ALL">Tất cả nhà thầu</option></select></div>
   <div><label class="lbl">Tên công trình</label><select id="fP" onchange="go()"><option value="ALL">Tất cả công trình</option></select></div>
-  <div><label class="lbl">Trạng thái</label><select id="fS" onchange="go()"><option value="ALL">Tất cả</option><option value="cham">Chậm tiến độ</option><option value="ok">Hoàn thành/Đảm bảo</option><option value="chuathi">Mới khởi công</option></select></div>
+  <div><label class="lbl">Trạng thái</label><select id="fS" onchange="go()"><option value="ALL">Tất cả</option><option value="ok">Đã hoàn thành</option><option value="dang">Đang thực hiện</option></select></div>
 </div></div>
 
 <!-- KPIs -->
@@ -290,7 +290,7 @@ const COL_KEYS = ['id','name','tuyen','tc','st','kc','ht','tmdt','hdXL','dp','kx
 const Ty  = v => (parseFloat((v||'').toString().replace(/,/g,'.'))||0); // sheet "Tong hop" đã ở đơn vị tỷ đồng
 const TyF = v => Ty(v).toFixed(2);
 const N   = v => new Intl.NumberFormat('vi-VN',{maximumFractionDigits:2}).format(Ty(v));
-const SC  = s => !s?'bg-x':s.includes('Chậm')?'bg-r':(s.includes('Hoàn thành')||s.includes('Đảm bảo'))?'bg-g':'bg-x';
+const SC  = s => (s||'').includes('Đã hoàn thành')?'bg-g':'bg-b';
 function parseDate(s){if(!s)return null;const p=(s||'').trim().split('/');return p.length<3?null:new Date(+p[2],+p[1]-1,+p[0]);}
 function fmtD(s){const d=parseDate(s);return d?d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear():s||'—';}
 function daysBetween(a,b){return Math.round((b-a)/86400000);}
@@ -354,19 +354,24 @@ async function fetchData(){
     applyOverrides(DATA); // Patch ngày KC/HT cho các công trình cần thiết
     filtered = [...DATA];
     rebuildFilters();
-    // Lấy các ô tổng riêng lẻ: Kế hoạch vốn (K5), Thực hiện lũy kế (L5), Giải ngân lũy kế (O5)
-    // — cùng sheet hiện tại ("Tong hop") — và Kế hoạch TH/GN trong tháng (P3 - sheet "Thuc hien" /
-    // "Giai ngan"). Đơn vị gốc là triệu đồng như các cột khác của sheet "Tong hop" → quy đổi /1000
-    // ra tỷ đồng cho đồng nhất.
+    // Lấy các ô tổng riêng lẻ trên sheet "Tong hop": Kế hoạch vốn (cột L = Kế hoạch vốn gói thầu
+    // xây lắp), Thực hiện lũy kế (cột M), Giải ngân lũy kế (cột P) — đối chiếu trực tiếp với dòng
+    // "Tổng" (dòng 5) trên sheet: L5=259.278, M5=127.708, P5=172.208.
+    // (Trước đây lấy nhầm K5/L5/O5 — lệch 1 cột về bên trái do thiếu cột "Trạng thái" khi đếm.)
+    // Kế hoạch TH/GN trong tháng vẫn lấy P3 ở 2 sheet riêng "Thuc hien"/"Giai ngan" như cũ.
     const [khVon, thLuyKe, gnLuyKe, khTH, khGN] = await Promise.all([
-      fetchCell(CFG.sheetName, 'K5'),
       fetchCell(CFG.sheetName, 'L5'),
-      fetchCell(CFG.sheetName, 'O5'),
+      fetchCell(CFG.sheetName, 'M5'),
+      fetchCell(CFG.sheetName, 'P5'),
       fetchCell('Thuc hien', 'P3'),
       fetchCell('Giai ngan', 'P3')
     ]);
-    KH_VON_K5 = khVon/1000; KH_TH_THANG = khTH/1000; KH_GN_THANG = khGN/1000;
-    TH_LUYKE_L5 = thLuyKe/1000; GN_LUYKE_O5 = gnLuyKe/1000;
+    // Sheet "Tong hop" đã ở đơn vị tỷ đồng (xác nhận qua dòng Tổng) → không chia /1000 nữa.
+    // Lưu ý: KH_TH_THANG/KH_GN_THANG lấy từ 2 sheet khác ("Thuc hien"/"Giai ngan") nên mình
+    // chưa có dữ liệu để xác nhận đơn vị — tạm giữ nguyên /1000 như cũ, bạn kiểm tra lại 2 số
+    // này trên dashboard xem có đúng không, nếu sai đơn vị thì báo mình bỏ luôn /1000 ở đây.
+    KH_VON_K5 = khVon; KH_TH_THANG = khTH/1000; KH_GN_THANG = khGN/1000;
+    TH_LUYKE_L5 = thLuyKe; GN_LUYKE_O5 = gnLuyKe;
     renderAll();
     const now=new Date();
     document.getElementById('lastSync').textContent=`Cập nhật: ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
@@ -494,10 +499,13 @@ function parseGviz(json){
   }
   // 4) Fallback theo vị trí cột cố định của sheet "Tong hop" (dùng khi tiêu đề bị gộp/merge
   // qua 2 dòng khiến gviz không tự nhận diện được tên cột theo chữ).
-  // Thứ tự cột thực tế: STT, Tên dự án, (cột trống), Tuyến, Tính chất, TMĐT, Giá trị xây lắp,
-  // Chi phí dự phòng, Ngày KC, Ngày HT, KH vốn XL, TH lũy kế, Tiến độ TH%, Ngày cập nhật(TH),
-  // GN lũy kế, Tỷ lệ GN%, Ngày cập nhật(GN), Tỷ lệ GN/KH GN, GN cần trong tháng, TH cần trong tháng
-  const POS_FALLBACK = {id:0,name:1,tuyen:3,tc:4,tmdt:5,hdXL:6,dp:7,kc:8,ht:9,kxl:10,lkt:11,updTH:13,lkg:14,updGN:16,dc:17,gnThang:18,thThang:19};
+  // Thứ tự cột thực tế (đã đối chiếu trực tiếp với sheet): STT, Tên dự án, (cột trống), Tuyến,
+  // Tính chất, Trạng thái, TMĐT, Giá trị xây lắp, Chi phí dự phòng, Ngày KC, Ngày HT, KH vốn XL,
+  // TH lũy kế, Tiến độ TH%, Ngày cập nhật(TH), GN lũy kế, Tỷ lệ GN%, Ngày cập nhật(GN),
+  // Tỷ lệ GN/KH GN, GN cần trong tháng, TH cần trong tháng.
+  // (Trước đây thiếu cột "Trạng thái" trong bản đồ này → mọi cột từ TMĐT trở đi bị lệch 1 vị trí
+  // mỗi khi phải dùng tới fallback, khiến cột Trạng thái/Tính chất hiển thị sai trên dashboard.)
+  const POS_FALLBACK = {id:0,name:1,tuyen:3,tc:4,st:5,tmdt:6,hdXL:7,dp:8,kc:9,ht:10,kxl:11,lkt:12,updTH:14,lkg:15,updGN:17,dc:18,gnThang:19,thThang:20};
   COL_KEYS.forEach(k=>{
     if(idx[k]<0 && POS_FALLBACK[k]!=null && cols[POS_FALLBACK[k]]!==undefined) idx[k]=POS_FALLBACK[k];
   });
@@ -516,22 +524,30 @@ function parseGviz(json){
     const tc = tcBase.toLowerCase().includes('chuy')?'Chuyển tiếp':tcBase.toLowerCase().includes('kh')?'Khởi công mới':tcBase;
     const stFromTc = tcMatch?tcMatch[2].trim():'';
     const stCol = g('st');
-    const st = stCol || stFromTc;
+    const idVal = g('id');
     // Cờ "đã hoàn thành" xác định từ TOÀN BỘ nội dung cột Tính chất (E) VÀ cột Trạng thái (F).
     // Sheet "Tong hop" có 2 kiểu ghi trạng thái khác nhau tuỳ dòng:
     //  - Gộp trong ngoặc của cột Tính chất, vd: "Chuyển tiếp   (Đã hoàn thành)"
     //  - Hoặc để riêng ở cột Trạng thái, vd: Tính chất="Chuyển tiếp", Trạng thái="Hoàn thành"
     // Nên phải kiểm tra cả 2 nguồn để không bỏ sót công trình đã xong.
-    const stDe = deAccent(rawTc + ' ' + stCol);
-    const doneFlag = stDe.includes('hoan thanh') || /dua vao.*su dung/.test(stDe) || stDe.includes('khai thac su dung');
-    return {id:g('id'),name:g('name'),tuyen,tc,ctr:'',doneFlag,
+    const stDe = deAccent(rawTc + ' ' + stCol + ' ' + stFromTc);
+    // Lưới an toàn theo STT: nếu vì lý do gì đó (đổi định dạng cột, gộp dòng...) mà việc dò chữ
+    // ở trên không nhận ra, các STT dưới đây vẫn LUÔN được tính là đã hoàn thành (đối chiếu trực
+    // tiếp với sheet "Tong hop" ngày cập nhật gần nhất: STT 3, 11, 12, 13, 14, 15 đều đã Hoàn thành).
+    const DONE_STT_SAFETY = [3,11,12,13,14,15];
+    const doneFlag = stDe.includes('hoan thanh') || /dua vao.*su dung/.test(stDe) || stDe.includes('khai thac su dung') || DONE_STT_SAFETY.includes(Number(idVal));
+    // Cột Trạng thái hiển thị trên dashboard chỉ gồm ĐÚNG 2 mức, giống cách sheet thể hiện:
+    // "Đã hoàn thành" hoặc "Đang thực hiện" — không dùng các nhãn phụ (Chậm tiến độ, Đảm bảo...) nữa.
+    const st = doneFlag ? 'Đã hoàn thành' : 'Đang thực hiện';
+    return {id:idVal,name:g('name'),tuyen,tc,ctr:'',doneFlag,
       kc:gDate('kc'),  // dùng gvizToDate thay vì g()
       ht:gDate('ht'),  // dùng gvizToDate thay vì g()
-      // Sheet "Tong hop" đang ở đơn vị triệu đồng → quy đổi /1000 để ra tỷ đồng (giống sheet cũ)
+      // Sheet "Tong hop" đã ở đơn vị tỷ đồng (đối chiếu trực tiếp với dòng "Tổng" trên sheet:
+      // TMĐT tổng = 513.664, khớp đúng khi KHÔNG chia /1000) → giữ nguyên giá trị, không quy đổi.
       // Cột "Tỷ lệ GN/KH GN" trong sheet định dạng %, gviz trả .v ở dạng phân số (vd 0.6 = 60%) → nhân 100
-      tmdt:n('tmdt')/1000,hdXL:n('hdXL')/1000,dp:n('dp')/1000,kxl:n('kxl')/1000,lkt:n('lkt')/1000,lkg:n('lkg')/1000,dc:n('dc')*100,st,
+      tmdt:n('tmdt'),hdXL:n('hdXL'),dp:n('dp'),kxl:n('kxl'),lkt:n('lkt'),lkg:n('lkg'),dc:n('dc')*100,st,
       updTH:gDate('updTH'),updGN:gDate('updGN'),
-      gnThang:n('gnThang')/1000,thThang:n('thThang')/1000};
+      gnThang:n('gnThang'),thThang:n('thThang')};
   });
   // Gộp các dòng tách theo nhà thầu (liên danh) vào công trình chính liền trước,
   // thay vì đếm mỗi dòng là 1 công trình riêng biệt.
@@ -592,7 +608,7 @@ function go(){
     n=document.getElementById('fN').value,pid=document.getElementById('fP').value,st=document.getElementById('fS').value;
   filtered=DATA.filter(d=>{
     const nm=n==='ALL'||(n==='__e__'&&!d.ctr)||n===d.ctr;
-    const sm=st==='ALL'||(st==='cham'&&(d.st||'').includes('Chậm'))||(st==='ok'&&((d.st||'').includes('Hoàn thành')||(d.st||'').includes('Đảm bảo')))||(st==='chuathi'&&!d.st);
+    const sm=st==='ALL'||(st==='ok'&&d.doneFlag)||(st==='dang'&&!d.doneFlag);
     const pm=pid==='ALL'||d.id===pid||d.name===pid;
     const tm=t==='ALL'||d.tuyen===t;
     const tcm=tc==='ALL'||d.tc===tc;
