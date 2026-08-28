@@ -251,6 +251,7 @@ tr.sub-row td{transition:background .15s}
   <div style="overflow-x:auto;max-height:500px;overflow-y:auto">
     <table><thead><tr>
       <th rowspan="2">#</th><th rowspan="2">Tên công trình</th><th rowspan="2">Tuyến</th><th rowspan="2">Tính chất</th><th rowspan="2">Nhà thầu</th>
+      <th rowspan="2" style="text-align:center">Trạng thái</th>
       <th rowspan="2" style="min-width:280px;text-align:center">Thời gian thực hiện dự án</th>
       <th rowspan="2" style="text-align:right">TMĐT<br><span style="color:var(--t3)">(tỷ)</span></th>
       <th colspan="2" style="text-align:center;border-left:1px solid var(--bd);white-space:normal;max-width:120px">Giá trị Hợp đồng/PLHĐ</th>
@@ -267,7 +268,7 @@ tr.sub-row td{transition:background .15s}
       <th class="sub" style="text-align:right;border-left:1px solid var(--bd);white-space:normal;max-width:80px">Giá trị xây lắp<br><span style="color:var(--t3)">(tỷ)</span></th>
       <th class="sub" style="text-align:center;white-space:normal;max-width:80px">Chi phí dự phòng<br><span style="color:var(--t3)">(tỷ)</span></th>
     </tr></thead>
-    <tbody id="tb"><tr><td colspan="17" style="text-align:center;padding:30px;color:var(--t3)">⏳ Nhấn ⚙ Cấu hình để kết nối Google Sheets</td></tr></tbody>
+    <tbody id="tb"><tr><td colspan="18" style="text-align:center;padding:30px;color:var(--t3)">⏳ Nhấn ⚙ Cấu hình để kết nối Google Sheets</td></tr></tbody>
     </table>
   </div>
 </div>
@@ -279,6 +280,8 @@ tr.sub-row td{transition:background .15s}
 let CFG = null, DATA = [], filtered = [], charts = {}, refreshTimer = null, countdown = 300;
 // Kế hoạch vốn (ô K5 sheet "Tong hop") và Kế hoạch TH/GN trong tháng (ô P3 sheet "Thuc hien" / "Giai ngan")
 let KH_VON_K5 = 0, KH_TH_THANG = 0, KH_GN_THANG = 0;
+// Giá trị thực hiện lũy kế (ô L5) và giải ngân lũy kế (ô O5) — sheet "Tong hop"
+let TH_LUYKE_L5 = 0, GN_LUYKE_O5 = 0;
 const TODAY = new Date(); // Ngày thực tế hôm nay
 const CC8 = ['#06b6d4','#3b82f6','#10b981','#f59e0b','#ef4444','#a78bfa','#f472b6','#84cc16'];
 const COL_KEYS = ['id','name','tuyen','tc','st','kc','ht','tmdt','hdXL','dp','kxl','lkt','updTH','lkg','updGN','dc','gnThang','thThang'];
@@ -353,15 +356,19 @@ async function fetchData(){
     applyOverrides(DATA); // Patch ngày KC/HT cho các công trình cần thiết
     filtered = [...DATA];
     rebuildFilters();
-    // Lấy các ô tổng riêng lẻ: Kế hoạch vốn (K5 - sheet hiện tại) và Kế hoạch TH/GN trong tháng
-    // (P3 - sheet "Thuc hien" / "Giai ngan"). Đơn vị gốc là triệu đồng như các cột khác của sheet
-    // "Tong hop" → quy đổi /1000 ra tỷ đồng cho đồng nhất.
-    const [khVon, khTH, khGN] = await Promise.all([
+    // Lấy các ô tổng riêng lẻ: Kế hoạch vốn (K5), Thực hiện lũy kế (L5), Giải ngân lũy kế (O5)
+    // — cùng sheet hiện tại ("Tong hop") — và Kế hoạch TH/GN trong tháng (P3 - sheet "Thuc hien" /
+    // "Giai ngan"). Đơn vị gốc là triệu đồng như các cột khác của sheet "Tong hop" → quy đổi /1000
+    // ra tỷ đồng cho đồng nhất.
+    const [khVon, thLuyKe, gnLuyKe, khTH, khGN] = await Promise.all([
       fetchCell(CFG.sheetName, 'K5'),
+      fetchCell(CFG.sheetName, 'L5'),
+      fetchCell(CFG.sheetName, 'O5'),
       fetchCell('Thuc hien', 'P3'),
       fetchCell('Giai ngan', 'P3')
     ]);
     KH_VON_K5 = khVon/1000; KH_TH_THANG = khTH/1000; KH_GN_THANG = khGN/1000;
+    TH_LUYKE_L5 = thLuyKe/1000; GN_LUYKE_O5 = gnLuyKe/1000;
     renderAll();
     const now=new Date();
     document.getElementById('lastSync').textContent=`Cập nhật: ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
@@ -643,13 +650,13 @@ function renderAll(){
   document.getElementById('kR').style.color=rate>60?'var(--gn)':rate>30?'var(--am)':'var(--rd)';
   document.getElementById('cnt').textContent=f.length+' công trình';
 
-  // Sheet "Tong hop" không có số liệu tách theo từng tháng (T1-T6), chỉ có nhu cầu vốn
-  // "cần thực hiện/giải ngân trong tháng" hiện tại. Bổ sung thêm 2 cột Kế hoạch TH/GN trong tháng
-  // (lấy từ ô P3 sheet "Thuc hien" / "Giai ngan") để so sánh cạnh nhau.
+  // Cột "Giá trị TH/GN trong tháng" đổi thành giá trị lũy kế (L5: Thực hiện lũy kế, O5: Giải ngân
+  // lũy kế — sheet "Tong hop"), đặt cạnh Kế hoạch TH/GN trong tháng (P3 - sheet "Thuc hien"/"Giai ngan")
+  // để so sánh.
   const barSetsM=[
-    {l:'Giá trị cần thực hiện trong tháng (tỷ đồng)',d:[+sThThang.toFixed(2)],bg:'rgba(96,165,250,0.7)',bc:'#60a5fa'},
+    {l:'Giá trị thực hiện lũy kế (tỷ đồng)',d:[+TH_LUYKE_L5.toFixed(2)],bg:'rgba(96,165,250,0.7)',bc:'#60a5fa'},
     {l:'Kế hoạch thực hiện tháng (tỷ đồng)',d:[+KH_TH_THANG.toFixed(2)],bg:'rgba(167,139,250,0.55)',bc:'#a78bfa'},
-    {l:'Giá trị cần giải ngân trong tháng (tỷ đồng)',d:[+sGnThang.toFixed(2)],bg:'rgba(74,222,128,0.75)',bc:'#4ade80'},
+    {l:'Giá trị giải ngân lũy kế (tỷ đồng)',d:[+GN_LUYKE_O5.toFixed(2)],bg:'rgba(74,222,128,0.75)',bc:'#4ade80'},
     {l:'Kế hoạch giải ngân tháng (tỷ đồng)',d:[+KH_GN_THANG.toFixed(2)],bg:'rgba(251,191,36,0.55)',bc:'#fbbf24'}
   ];
   mkBar('cM',['Tháng hiện tại'],barSetsM);
@@ -720,7 +727,8 @@ function renderAll(){
     const gnTBox=gnT>0?`<span class="dc-box dp">+${gnT.toFixed(2)}</span>`:gnT<0?`<span class="dc-box dn">${gnT.toFixed(2)}</span>`:`<span class="dc-box dz">0</span>`;
     const thTBox=thT>0?`<span class="dc-box dp">+${thT.toFixed(2)}</span>`:thT<0?`<span class="dc-box dn">${thT.toFixed(2)}</span>`:`<span class="dc-box dz">0</span>`;
     const hasBreak=!!(d.breakdown&&d.breakdown.length);
-    const mainRow=`<tr class="main-row"${hasBreak?` data-idx="${i}" onclick="toggleRow(${i})" style="cursor:pointer"`:''}><td style="color:var(--t3);font-weight:700;padding-top:9px">${i+1}</td><td class="nc">${hasBreak?`<span class="toggle-ic" id="tgl-${i}">▶</span> `:''}${d.name}${hasBreak?`<span class="sub-count"> (${d.breakdown.length} nhà thầu)</span>`:''}</td><td style="padding-top:8px"><span class="badge ${d.tuyen==='Quốc lộ'?'bg-b':'bg-a'}">${d.tuyen}</span></td><td style="padding-top:8px"><span class="badge ${d.tc==='Chuyển tiếp'?'bg-a':'bg-g'}">${d.tc}</span></td><td style="padding-top:8px;min-width:100px;max-width:145px;word-break:break-word;font-size:10px">${d.ctr||'Mới khởi công'}</td><td class="tl-cell">${buildTimeline(d.kc,d.ht,d.st,d.lkt,d.hdXL,d.lkg,d.kxl,d.dp)}</td><td style="text-align:right;color:var(--pu);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.tmdt)}</td><td style="text-align:right;color:var(--or);padding-top:8px;font-size:14px;font-weight:900;border-left:1px solid rgba(10,77,90,.4)">${TyF(d.hdXL)}</td><td style="text-align:right;color:var(--t2);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.dp)}</td><td style="text-align:right;color:var(--bl);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.kxl)}</td><td style="text-align:right;color:#93c5fd;padding-top:8px;font-size:14px;font-weight:900">${TyF(d.lkt)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updTH)}</td><td style="text-align:right;color:var(--gn);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.lkg)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updGN)}</td><td style="padding-top:8px"><div style="display:flex;align-items:center;gap:5px;margin-top:3px"><div class="bt" style="height:7px"><div class="bf" style="width:${ratioPct.toFixed(0)}%;background:${ratioColor};height:7px"></div></div><span style="font-size:13px;font-weight:900;min-width:30px;text-align:right;color:${ratioColor}">${ratioLbl}</span></div></td><td style="text-align:right;padding-top:8px">${gnTBox}</td><td style="text-align:right;padding-top:8px">${thTBox}</td></tr>`;
+    const stBadge=`<span class="badge ${SC(d.st)}">${d.st||'—'}</span>`;
+    const mainRow=`<tr class="main-row"${hasBreak?` data-idx="${i}" onclick="toggleRow(${i})" style="cursor:pointer"`:''}><td style="color:var(--t3);font-weight:700;padding-top:9px">${i+1}</td><td class="nc">${hasBreak?`<span class="toggle-ic" id="tgl-${i}">▶</span> `:''}${d.name}${hasBreak?`<span class="sub-count"> (${d.breakdown.length} nhà thầu)</span>`:''}</td><td style="padding-top:8px"><span class="badge ${d.tuyen==='Quốc lộ'?'bg-b':'bg-a'}">${d.tuyen}</span></td><td style="padding-top:8px"><span class="badge ${d.tc==='Chuyển tiếp'?'bg-a':'bg-g'}">${d.tc}</span></td><td style="padding-top:8px;min-width:100px;max-width:145px;word-break:break-word;font-size:10px">${d.ctr||'Mới khởi công'}</td><td style="padding-top:8px;text-align:center;white-space:normal;max-width:120px">${stBadge}</td><td class="tl-cell">${buildTimeline(d.kc,d.ht,d.st,d.lkt,d.hdXL,d.lkg,d.kxl,d.dp)}</td><td style="text-align:right;color:var(--pu);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.tmdt)}</td><td style="text-align:right;color:var(--or);padding-top:8px;font-size:14px;font-weight:900;border-left:1px solid rgba(10,77,90,.4)">${TyF(d.hdXL)}</td><td style="text-align:right;color:var(--t2);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.dp)}</td><td style="text-align:right;color:var(--bl);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.kxl)}</td><td style="text-align:right;color:#93c5fd;padding-top:8px;font-size:14px;font-weight:900">${TyF(d.lkt)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updTH)}</td><td style="text-align:right;color:var(--gn);padding-top:8px;font-size:14px;font-weight:900">${TyF(d.lkg)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updGN)}</td><td style="padding-top:8px"><div style="display:flex;align-items:center;gap:5px;margin-top:3px"><div class="bt" style="height:7px"><div class="bf" style="width:${ratioPct.toFixed(0)}%;background:${ratioColor};height:7px"></div></div><span style="font-size:13px;font-weight:900;min-width:30px;text-align:right;color:${ratioColor}">${ratioLbl}</span></div></td><td style="text-align:right;padding-top:8px">${gnTBox}</td><td style="text-align:right;padding-top:8px">${thTBox}</td></tr>`;
     const subRows=(d.breakdown&&d.breakdown.length)?d.breakdown.map((b,j)=>{
       const bhdXL=Number(b.hdXL)||0,bdp=Number(b.dp)||0,bkxl=Number(b.kxl)||0,blkt=Number(b.lkt)||0,blkg=Number(b.lkg)||0,bdc=Number(b.dc)||0;
       const bTongHD=bhdXL+bdp;
@@ -731,7 +739,7 @@ function renderAll(){
       const bgnT=Number(b.gnThang)||0, bthT=Number(b.thThang)||0;
       const bgnTBox=bgnT>0?`<span class="dc-box dp">+${bgnT.toFixed(2)}</span>`:bgnT<0?`<span class="dc-box dn">${bgnT.toFixed(2)}</span>`:`<span class="dc-box dz">0</span>`;
       const bthTBox=bthT>0?`<span class="dc-box dp">+${bthT.toFixed(2)}</span>`:bthT<0?`<span class="dc-box dn">${bthT.toFixed(2)}</span>`:`<span class="dc-box dz">0</span>`;
-      return `<tr class="sub-row" data-parent="${i}" style="display:none;background:rgba(255,255,255,.02)"><td style="color:var(--t3);font-weight:700;padding-top:8px;font-size:10px">${i+1}.${j+1}</td><td class="nc" style="font-size:11px;color:var(--t2);font-style:italic">↳ Chi tiết nhà thầu: ${b.ctr||'—'}</td><td></td><td></td><td style="padding-top:8px;min-width:100px;max-width:145px;word-break:break-word;font-size:10px;color:var(--t3)">—</td><td class="tl-cell"><div class="tl-wrap">${bTongHD>0?`<div class="tl-bar-bg" style="height:7px"><div class="tl-bar-fill" style="width:${bThLkPct.toFixed(0)}%;background:#fb923c;height:7px"></div></div><div class="tl-info" style="color:#fb923c;font-size:11px;font-weight:800;margin-top:2px">🟧 Tiến độ thực hiện: ${bThLkPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkt)}/${TyF(bTongHD)} tỷ)</span></div>`:''}${bkxl>0?`<div class="tl-bar-bg" style="height:7px;margin-top:4px"><div class="tl-bar-fill" style="width:${bGnKhXlPct.toFixed(0)}%;background:#60a5fa;height:7px"></div></div><div class="tl-info" style="color:#60a5fa;font-size:11px;font-weight:800;margin-top:2px">🟦 Tỷ lệ giải ngân: ${bGnKhXlPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkg)}/${TyF(bkxl)} tỷ)</span></div>`:''}</div></td><td style="text-align:right;color:var(--t3);padding-top:8px">—</td><td style="text-align:right;color:var(--or);padding-top:8px;font-size:13px;font-weight:900;border-left:1px solid rgba(10,77,90,.4)">${TyF(bhdXL)}</td><td style="text-align:right;color:var(--t2);padding-top:8px;font-size:13px;font-weight:900">${TyF(bdp)}</td><td style="text-align:right;color:var(--bl);padding-top:8px;font-size:13px;font-weight:900">${TyF(bkxl)}</td><td style="text-align:right;color:#93c5fd;padding-top:8px;font-size:13px;font-weight:900">${TyF(blkt)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updTH)}</td><td style="text-align:right;color:var(--gn);padding-top:8px;font-size:13px;font-weight:900">${TyF(blkg)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updGN)}</td><td style="padding-top:8px">${bdc?`<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><div class="bt" style="height:7px"><div class="bf" style="width:${bRatioPct.toFixed(0)}%;background:${bRatioColor};height:7px"></div></div><span style="font-size:12px;font-weight:900;min-width:28px;text-align:right;color:${bRatioColor}">${bdc.toFixed(0)}%</span></div>`:'<span style="color:var(--t3);font-size:10px">—</span>'}</td><td style="text-align:right;padding-top:8px">${bgnTBox}</td><td style="text-align:right;padding-top:8px">${bthTBox}</td></tr>`;
+      return `<tr class="sub-row" data-parent="${i}" style="display:none;background:rgba(255,255,255,.02)"><td style="color:var(--t3);font-weight:700;padding-top:8px;font-size:10px">${i+1}.${j+1}</td><td class="nc" style="font-size:11px;color:var(--t2);font-style:italic">↳ Chi tiết nhà thầu: ${b.ctr||'—'}</td><td></td><td></td><td style="padding-top:8px;min-width:100px;max-width:145px;word-break:break-word;font-size:10px;color:var(--t3)">—</td><td></td><td class="tl-cell"><div class="tl-wrap">${bTongHD>0?`<div class="tl-bar-bg" style="height:7px"><div class="tl-bar-fill" style="width:${bThLkPct.toFixed(0)}%;background:#fb923c;height:7px"></div></div><div class="tl-info" style="color:#fb923c;font-size:11px;font-weight:800;margin-top:2px">🟧 Tiến độ thực hiện: ${bThLkPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkt)}/${TyF(bTongHD)} tỷ)</span></div>`:''}${bkxl>0?`<div class="tl-bar-bg" style="height:7px;margin-top:4px"><div class="tl-bar-fill" style="width:${bGnKhXlPct.toFixed(0)}%;background:#60a5fa;height:7px"></div></div><div class="tl-info" style="color:#60a5fa;font-size:11px;font-weight:800;margin-top:2px">🟦 Tỷ lệ giải ngân: ${bGnKhXlPct.toFixed(0)}% <span style="font-size:10px;font-weight:900;color:#fff">(${TyF(blkg)}/${TyF(bkxl)} tỷ)</span></div>`:''}</div></td><td style="text-align:right;color:var(--t3);padding-top:8px">—</td><td style="text-align:right;color:var(--or);padding-top:8px;font-size:13px;font-weight:900;border-left:1px solid rgba(10,77,90,.4)">${TyF(bhdXL)}</td><td style="text-align:right;color:var(--t2);padding-top:8px;font-size:13px;font-weight:900">${TyF(bdp)}</td><td style="text-align:right;color:var(--bl);padding-top:8px;font-size:13px;font-weight:900">${TyF(bkxl)}</td><td style="text-align:right;color:#93c5fd;padding-top:8px;font-size:13px;font-weight:900">${TyF(blkt)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updTH)}</td><td style="text-align:right;color:var(--gn);padding-top:8px;font-size:13px;font-weight:900">${TyF(blkg)}</td><td style="text-align:center;padding-top:8px;color:var(--t3);font-size:10px">${fmtD(d.updGN)}</td><td style="padding-top:8px">${bdc?`<div style="display:flex;align-items:center;gap:5px;margin-top:3px"><div class="bt" style="height:7px"><div class="bf" style="width:${bRatioPct.toFixed(0)}%;background:${bRatioColor};height:7px"></div></div><span style="font-size:12px;font-weight:900;min-width:28px;text-align:right;color:${bRatioColor}">${bdc.toFixed(0)}%</span></div>`:'<span style="color:var(--t3);font-size:10px">—</span>'}</td><td style="text-align:right;padding-top:8px">${bgnTBox}</td><td style="text-align:right;padding-top:8px">${bthTBox}</td></tr>`;
     }).join(''):'';
     return mainRow+subRows;
   }).join('');
