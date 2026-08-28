@@ -366,12 +366,10 @@ async function fetchData(){
       fetchCell('Thuc hien', 'P3'),
       fetchCell('Giai ngan', 'P3')
     ]);
-    // Sheet "Tong hop" đã ở đơn vị tỷ đồng (xác nhận qua dòng Tổng) → không chia /1000 nữa.
-    // Lưu ý: KH_TH_THANG/KH_GN_THANG lấy từ 2 sheet khác ("Thuc hien"/"Giai ngan") nên mình
-    // chưa có dữ liệu để xác nhận đơn vị — tạm giữ nguyên /1000 như cũ, bạn kiểm tra lại 2 số
-    // này trên dashboard xem có đúng không, nếu sai đơn vị thì báo mình bỏ luôn /1000 ở đây.
-    KH_VON_K5 = khVon; KH_TH_THANG = khTH/1000; KH_GN_THANG = khGN/1000;
-    TH_LUYKE_L5 = thLuyKe; GN_LUYKE_O5 = gnLuyKe;
+    // Các ô tổng L5/M5/P5 lấy nguyên giá trị thô từ sheet (đơn vị triệu đồng) nên cần chia /1000
+    // để quy về tỷ đồng, khớp với các số liệu cộng dồn theo dòng (sTH, sGN...) ở nơi khác trong dashboard.
+    KH_VON_K5 = khVon/1000; KH_TH_THANG = khTH/1000; KH_GN_THANG = khGN/1000;
+    TH_LUYKE_L5 = thLuyKe/1000; GN_LUYKE_O5 = gnLuyKe/1000;
     renderAll();
     const now=new Date();
     document.getElementById('lastSync').textContent=`Cập nhật: ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
