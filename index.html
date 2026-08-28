@@ -319,14 +319,12 @@ function saveConfig(){
 }
 
 /* ======= OVERRIDE ngày KC/HT theo STT (index bắt đầu từ 0) ======= */
+// Đã TẮT: sheet "Tong hop" giờ đã có đầy đủ ngày KC/HT thật cho mọi dòng, nên không cần
+// gán cứng nữa (mảng override cũ còn khiến STT 7-11 hiển thị SAI ngày, ví dụ STT 11 bị
+// đè thành 2026 trong khi thực tế đã hoàn thành từ 30/03/2026 với ngày KC 23/05/2025).
+// Nếu sau này có dòng nào sheet thật sự thiếu ngày, thêm lại 1 dòng vào mảng overrides bên dưới.
 function applyOverrides(data){
   const overrides = [
-    [6,  '5/7/2026',  '1/3/2027',   'Đảm bảo tiến độ/Đang thi công'],
-    [7,  '6/7/2026',  '6/10/2027',  'Đảm bảo tiến độ/Đang thi công'],
-    [8,  '10/7/2026', '10/10/2027', 'Đảm bảo tiến độ/Đang thi công'],
-    [9,  '8/7/2026',  '8/10/2027',  'Đảm bảo tiến độ/Đang thi công'],
-    [10, '25/6/2026', '25/12/2026', 'Đảm bảo tiến độ/Đang thi công'],
-    [14, '11/9/2025', '11/4/2026',  'Đã hoàn thành'],
   ];
   overrides.forEach(([idx, kc, ht, st])=>{
     if(data[idx]){
@@ -519,10 +517,13 @@ function parseGviz(json){
     const stFromTc = tcMatch?tcMatch[2].trim():'';
     const stCol = g('st');
     const st = stCol || stFromTc;
-    // Cờ "đã hoàn thành" xác định trực tiếp từ TOÀN BỘ nội dung gốc cột E (Tính chất/Trạng thái),
-    // không chỉ phần trong ngoặc — để không bỏ sót khi định dạng câu chữ trên sheet thay đổi.
-    const tcDe = deAccent(rawTc);
-    const doneFlag = tcDe.includes('hoan thanh') || /dua vao.*su dung/.test(tcDe) || tcDe.includes('khai thac su dung');
+    // Cờ "đã hoàn thành" xác định từ TOÀN BỘ nội dung cột Tính chất (E) VÀ cột Trạng thái (F).
+    // Sheet "Tong hop" có 2 kiểu ghi trạng thái khác nhau tuỳ dòng:
+    //  - Gộp trong ngoặc của cột Tính chất, vd: "Chuyển tiếp   (Đã hoàn thành)"
+    //  - Hoặc để riêng ở cột Trạng thái, vd: Tính chất="Chuyển tiếp", Trạng thái="Hoàn thành"
+    // Nên phải kiểm tra cả 2 nguồn để không bỏ sót công trình đã xong.
+    const stDe = deAccent(rawTc + ' ' + stCol);
+    const doneFlag = stDe.includes('hoan thanh') || /dua vao.*su dung/.test(stDe) || stDe.includes('khai thac su dung');
     return {id:g('id'),name:g('name'),tuyen,tc,ctr:'',doneFlag,
       kc:gDate('kc'),  // dùng gvizToDate thay vì g()
       ht:gDate('ht'),  // dùng gvizToDate thay vì g()
