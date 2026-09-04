@@ -229,12 +229,10 @@ tr.sub-row td{transition:background .15s}
 </div>
 
 <!-- CHARTS -->
-<div class="g3" style="grid-template-columns:1.05fr 1.15fr 1fr">
+<div class="g4">
   <div class="card" style="padding:12px"><div class="st">📈 Tình hình thực hiện, giải ngân kế hoạch vốn các gói thầu xây lắp</div><div style="height:260px;position:relative"><canvas id="cQ"></canvas></div></div>
-  <div class="card" style="padding:12px"><div class="st">📊 Giá trị cần Thực hiện/Giải ngân trong tháng</div><div class="g2">
-    <div><div class="stb">Giá trị cần thực hiện trong tháng</div><div style="height:230px;position:relative"><canvas id="cM1"></canvas></div></div>
-    <div><div class="stb">Giá trị cần giải ngân trong tháng</div><div style="height:230px;position:relative"><canvas id="cM2"></canvas></div></div>
-  </div></div>
+  <div class="card" style="padding:12px"><div class="st">📊 Giá trị cần thực hiện trong tháng</div><div style="height:260px;position:relative"><canvas id="cM1"></canvas></div></div>
+  <div class="card" style="padding:12px"><div class="st">📊 Giá trị cần giải ngân trong tháng</div><div style="height:260px;position:relative"><canvas id="cM2"></canvas></div></div>
   <div class="card" style="padding:12px"><div class="stb">🥧 Kết quả thực hiện các gói thầu xây lắp</div><div class="donut-lg"><canvas id="dKQ"></canvas><div class="dc-lbl"><div class="n" id="cKQ">—</div><div class="l">công trình</div></div></div></div>
 </div>
 <div class="g3">
@@ -244,7 +242,7 @@ tr.sub-row td{transition:background .15s}
 </div>
 <div class="g3">
   <div class="card" style="padding:12px"><div class="stb">📍 Tổng kế hoạch vốn – Theo tuyến đường</div><div class="donut-lg"><canvas id="dTuyen"></canvas></div></div>
-  <div class="card" style="padding:12px"><div class="stb">🔴 Các dự án chưa đạt kế hoạch</div><div class="donut-lg"><canvas id="dTienDo"></canvas></div></div>
+  <div class="card" style="padding:12px"><div class="stb">🔴 Các dự án chưa đạt kế hoạch</div><div id="rfList" style="max-height:230px;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding-right:3px"></div></div>
   <div class="card" style="padding:12px"><div class="stb">🏗️ Tổng kế hoạch vốn – Theo tính chất</div><div class="donut-lg"><canvas id="dTC"></canvas></div></div>
 </div>
 
@@ -742,13 +740,29 @@ function renderAll(){
   // để tránh tràn/vỡ layout biểu đồ.
   // Tên rút gọn + số liệu chi tiết hiển thị trực tiếp làm legend bên phải vòng tròn (không cần hover
   // mới thấy nữa); tooltip khi hover vẫn hiện đầy đủ thông tin tương tự.
-  const redFlagged = f.filter(d=>(Number(d.thThang)||0)<0);
+  // Danh sách xếp hạng các công trình "báo đỏ" (chưa đạt kế hoạch thực hiện trong tháng), sắp xếp
+  // giảm dần theo mức chậm (tỷ đồng) để dễ nhìn ra công trình/nhà thầu nào đang chậm nhất.
+  // Trình bày dạng danh sách thay vì biểu đồ tròn vì số lượng nhãn dài dễ gây vỡ layout khi vẽ donut.
+  const rfListEl = document.getElementById('rfList');
+  const redFlagged = f.filter(d=>(Number(d.thThang)||0)<0)
+    .map(d=>({name:d.name||'(Không tên)',ctr:d.ctr||'—',delay:Math.abs(Number(d.thThang)||0)}))
+    .sort((a,b)=>b.delay-a.delay);
   if(redFlagged.length){
-    const rfFull = redFlagged.map(d=>`${d.name}${d.ctr?' — '+d.ctr:''} (chậm ${Math.abs(Number(d.thThang)||0).toFixed(2)} tỷ)`);
-    const rfData = redFlagged.map(d=>+Math.max(Math.abs(Number(d.thThang)||0),0.01).toFixed(2));
-    mkDonut('dTienDo',rfFull,rfData,redFlagged.map((_,i)=>CC8[i%CC8.length]),null,false,null,'right');
+    const maxDelay = redFlagged[0].delay || 1;
+    rfListEl.innerHTML = redFlagged.map((r,i)=>`
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:16px;text-align:center;font-size:9px;font-weight:800;color:var(--t3);flex-shrink:0">${i+1}</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:6px">
+            <span style="font-size:10px;font-weight:800;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${r.name}">${r.name}</span>
+            <span class="badge bg-r" style="flex-shrink:0">chậm ${r.delay.toFixed(2)} tỷ</span>
+          </div>
+          <div style="font-size:9px;color:var(--t3);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:2px 0 4px" title="${r.ctr}">Nhà thầu: ${r.ctr}</div>
+          <div class="bt"><div class="bf" style="width:${Math.max(r.delay/maxDelay*100,4)}%;background:var(--rd)"></div></div>
+        </div>
+      </div>`).join('');
   }else{
-    mkDonut('dTienDo',['Không có dự án báo đỏ'],[1],['#1a3a45'],null,false,null,'right');
+    rfListEl.innerHTML = '<div style="text-align:center;color:var(--t3);font-size:10px;font-weight:700;padding:20px 0">✅ Không có dự án báo đỏ</div>';
   }
 
   document.getElementById('tb').innerHTML=f.map((d,i)=>{
