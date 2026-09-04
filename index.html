@@ -748,20 +748,14 @@ function renderAll(){
     .map(d=>({name:d.name||'(Không tên)',ctr:d.ctr||'—',delay:Math.abs(Number(d.thThang)||0)}))
     .sort((a,b)=>b.delay-a.delay);
   if(redFlagged.length){
-    const maxDelay = redFlagged[0].delay || 1;
     rfListEl.innerHTML = redFlagged.map((r,i)=>{
-      const pct = Math.max(r.delay/maxDelay*100,14);
       return `
       <div style="display:flex;gap:8px;min-width:0">
         <div style="width:16px;text-align:center;font-size:9px;font-weight:800;color:var(--t3);flex-shrink:0;padding-top:1px">${i+1}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:10.5px;font-weight:800;color:var(--tx);line-height:1.4;overflow-wrap:break-word" title="${r.name}">${r.name}</div>
-          <div style="font-size:9px;color:var(--t3);font-weight:600;line-height:1.4;overflow-wrap:break-word;margin:1px 0 5px" title="${r.ctr}">Nhà thầu: ${r.ctr}</div>
-          <div style="width:100%;height:16px;border-radius:5px;background:#0d2d38;position:relative;overflow:hidden">
-            <div style="height:100%;border-radius:5px;width:${pct}%;background:linear-gradient(90deg,#7f1d1d,var(--rd));display:flex;align-items:center;justify-content:flex-end;padding-right:6px;min-width:fit-content">
-              <span style="font-size:9px;font-weight:800;color:#fff;white-space:nowrap">chậm ${r.delay.toFixed(2)} tỷ</span>
-            </div>
-          </div>
+          <div style="font-size:10.5px;color:var(--t2);font-weight:700;line-height:1.4;overflow-wrap:break-word;margin:2px 0 6px" title="${r.ctr}">Nhà thầu: ${r.ctr}</div>
+          <span class="badge bg-r">chậm ${r.delay.toFixed(2)} tỷ</span>
         </div>
       </div>`;
     }).join('');
