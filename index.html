@@ -229,10 +229,13 @@ tr.sub-row td{transition:background .15s}
 </div>
 
 <!-- CHARTS -->
-<div class="g3">
-  <div class="card" style="padding:12px"><div class="st">📊 Giá trị cần Thực hiện/Giải ngân trong tháng</div><div style="height:260px;position:relative"><canvas id="cM"></canvas></div></div>
-  <div class="card" style="padding:12px"><div class="stb">🥧 Kết quả thực hiện các gói thầu xây lắp</div><div class="donut-lg"><canvas id="dKQ"></canvas></div></div>
+<div class="g3" style="grid-template-columns:1.05fr 1.15fr 1fr">
   <div class="card" style="padding:12px"><div class="st">📈 Tình hình thực hiện, giải ngân kế hoạch vốn các gói thầu xây lắp</div><div style="height:260px;position:relative"><canvas id="cQ"></canvas></div></div>
+  <div class="card" style="padding:12px"><div class="st">📊 Giá trị cần Thực hiện/Giải ngân trong tháng</div><div class="g2">
+    <div><div class="stb">Giá trị cần thực hiện trong tháng</div><div style="height:230px;position:relative"><canvas id="cM1"></canvas></div></div>
+    <div><div class="stb">Giá trị cần giải ngân trong tháng</div><div style="height:230px;position:relative"><canvas id="cM2"></canvas></div></div>
+  </div></div>
+  <div class="card" style="padding:12px"><div class="stb">🥧 Kết quả thực hiện các gói thầu xây lắp</div><div class="donut-lg"><canvas id="dKQ"></canvas><div class="dc-lbl"><div class="n" id="cKQ">—</div><div class="l">công trình</div></div></div></div>
 </div>
 <div class="g3">
   <div class="card" style="padding:12px"><div class="st">🔵 Quốc lộ</div><div class="donut-wrap"><canvas id="dQL"></canvas><div class="dc-lbl"><div class="n" id="cQL">—</div><div class="l">công trình</div></div></div></div>
@@ -651,7 +654,7 @@ const tyP={id:'tyP',afterDatasetDraw(ch){const{ctx,data}=ch;const vals=data.data
 
 function mkBar(id,labels,sets,usePct){const C=window.Chart;if(charts[id])charts[id].destroy();charts[id]=new C(document.getElementById(id),{type:'bar',data:{labels,datasets:sets.map(s=>({label:s.l,data:s.d,backgroundColor:s.bg,borderColor:s.bc,borderWidth:1.5,borderRadius:4,borderSkipped:false,barPercentage:0.92,categoryPercentage:0.75,_pct:s.pct||null}))},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:34}},plugins:{legend:{labels:{color:'#d1e8f0',usePointStyle:true,font:{size:11,weight:'700'}}},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>{const pctArr=c.dataset._pct;const pct=(pctArr&&pctArr[c.dataIndex]!=null)?' ('+pctArr[c.dataIndex].toFixed(1)+'% KH vốn)':'';return' '+c.dataset.label+': '+c.raw.toFixed(2)+' tỷ'+pct;}}}},scales:{y:{grace:'20%',grid:{color:'rgba(10,77,90,.35)'},ticks:{color:'#a0c0cc',font:{size:11,weight:'700'},callback:v=>v+' tỷ'},title:{display:true,text:'Tỷ đồng',color:'#8aaabb',font:{size:10}}},x:{grid:{display:false},ticks:{color:'#d1e8f0',font:{size:12,weight:'800'},maxRotation:0}}}},plugins:[usePct?bP2:bP]});}
 
-function mkDonut(id,labels,data,cols,extraDs,showLabel,fullLabels){const C=window.Chart;if(charts[id])charts[id].destroy();const ds=Object.assign({data,backgroundColor:cols,borderColor:'#03161d',borderWidth:2,hoverOffset:5},extraDs||{});const plugins=extraDs&&extraDs._c?[ctP]:(showLabel?[tyP]:[]);charts[id]=new C(document.getElementById(id),{type:'doughnut',data:{labels,datasets:[ds]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:'bottom',labels:{color:'#d1e8f0',usePointStyle:true,font:{size:8,weight:'700'},padding:7,boxWidth:8}},tooltip:{callbacks:{title(items){if(fullLabels){const i=items[0].dataIndex;return fullLabels[i]||items[0].label;}return items[0].label;},label(c){const t=c.dataset.data.reduce((a,b)=>a+b,0);const p=t>0?(c.raw/t*100).toFixed(1):'0';if(c.dataset._gn){const gn=c.dataset._gn[c.dataIndex]||0;const tg=c.dataset._gn.reduce((a,b)=>a+b,0);const pg=tg>0?(gn/tg*100).toFixed(1):'0';const vLbl=c.dataset._valLabel||'GN lũy kế';return[fullLabels?'':' '+c.label,' Số CT: '+c.raw+' ('+p+'%)',' '+vLbl+': '+gn.toFixed(2)+' tỷ ('+pg+'%)'].filter(Boolean);}return(fullLabels?' ':' '+c.label+': ')+c.raw.toFixed(2)+' tỷ ('+p+'%)';}}}}}},plugins);}
+function mkDonut(id,labels,data,cols,extraDs,showLabel,fullLabels,legendPos){const C=window.Chart;if(charts[id])charts[id].destroy();const ds=Object.assign({data,backgroundColor:cols,borderColor:'#03161d',borderWidth:2,hoverOffset:5},extraDs||{});const plugins=extraDs&&extraDs._c?[ctP]:(showLabel?[tyP]:[]);charts[id]=new C(document.getElementById(id),{type:'doughnut',data:{labels,datasets:[ds]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{position:legendPos||'bottom',align:legendPos==='right'?'start':'center',labels:{color:'#d1e8f0',usePointStyle:true,font:{size:legendPos==='right'?9:8,weight:'700'},padding:legendPos==='right'?8:7,boxWidth:8}},tooltip:{callbacks:{title(items){if(fullLabels){const i=items[0].dataIndex;return fullLabels[i]||items[0].label;}return items[0].label;},label(c){const t=c.dataset.data.reduce((a,b)=>a+b,0);const p=t>0?(c.raw/t*100).toFixed(1):'0';if(c.dataset._gn){const gn=c.dataset._gn[c.dataIndex]||0;const tg=c.dataset._gn.reduce((a,b)=>a+b,0);const pg=tg>0?(gn/tg*100).toFixed(1):'0';const vLbl=c.dataset._valLabel||'GN lũy kế';return[fullLabels?'':' '+c.label,' Số CT: '+c.raw+' ('+p+'%)',' '+vLbl+': '+gn.toFixed(2)+' tỷ ('+pg+'%)'].filter(Boolean);}return(fullLabels?' ':' '+c.label+': ')+c.raw.toFixed(2)+' tỷ ('+p+'%)';}}}}}},plugins);}
 
 /* ======= RENDER ======= */
 function renderAll(){
@@ -670,13 +673,21 @@ function renderAll(){
   // Cột "Giá trị TH/GN trong tháng" đổi thành giá trị lũy kế (L5: Thực hiện lũy kế, O5: Giải ngân
   // lũy kế — sheet "Tong hop"), đặt cạnh Kế hoạch TH/GN trong tháng (P3 - sheet "Thuc hien"/"Giai ngan")
   // để so sánh.
-  const barSetsM=[
-    {l:'Giá trị thực hiện lũy kế (tỷ đồng)',d:[+TH_LUYKE_L5.toFixed(2)],bg:'rgba(96,165,250,0.7)',bc:'#60a5fa'},
-    {l:'Kế hoạch thực hiện (tỷ đồng)',d:[+KH_TH_THANG.toFixed(2)],bg:'rgba(167,139,250,0.55)',bc:'#a78bfa'},
-    {l:'Giá trị giải ngân lũy kế (tỷ đồng)',d:[+GN_LUYKE_O5.toFixed(2)],bg:'rgba(74,222,128,0.75)',bc:'#4ade80'},
+  // % giá trị thực hiện lũy kế so với kế hoạch thực hiện, và % giá trị giải ngân lũy kế so với
+  // kế hoạch giải ngân — hiển thị phía trên cột lũy kế, cùng kiểu với bảng "Tình hình thực hiện,
+  // giải ngân kế hoạch vốn" bên cạnh.
+  const pctThThang = KH_TH_THANG>0 ? (TH_LUYKE_L5/KH_TH_THANG*100) : null;
+  const pctGnThang = KH_GN_THANG>0 ? (GN_LUYKE_O5/KH_GN_THANG*100) : null;
+  const barSetsM1=[
+    {l:'Giá trị thực hiện lũy kế (tỷ đồng)',d:[+TH_LUYKE_L5.toFixed(2)],bg:'rgba(96,165,250,0.7)',bc:'#60a5fa',pct:[pctThThang]},
+    {l:'Kế hoạch thực hiện (tỷ đồng)',d:[+KH_TH_THANG.toFixed(2)],bg:'rgba(167,139,250,0.55)',bc:'#a78bfa'}
+  ];
+  const barSetsM2=[
+    {l:'Giá trị giải ngân lũy kế (tỷ đồng)',d:[+GN_LUYKE_O5.toFixed(2)],bg:'rgba(74,222,128,0.75)',bc:'#4ade80',pct:[pctGnThang]},
     {l:'Kế hoạch giải ngân (tỷ đồng)',d:[+KH_GN_THANG.toFixed(2)],bg:'rgba(251,191,36,0.55)',bc:'#fbbf24'}
   ];
-  mkBar('cM',['Tháng hiện tại'],barSetsM);
+  mkBar('cM1',['Tháng hiện tại'],barSetsM1,true);
+  mkBar('cM2',['Tháng hiện tại'],barSetsM2,true);
   // Tình hình thực hiện, giải ngân kế hoạch vốn các gói thầu xây lắp: thêm cột Kế hoạch vốn (ô K5)
   // và % của Thực hiện/Giải ngân lũy kế so với Kế hoạch vốn.
   const pctTH = KH_VON_K5>0 ? (sTH/KH_VON_K5*100) : null;
@@ -694,7 +705,8 @@ function renderAll(){
   const progArr = f.filter(d=>!d.doneFlag);
   const doneVal = +(doneCt.reduce((s,d)=>s+(Number(d.lkt)||0),0)).toFixed(2);
   const progVal = +(progArr.reduce((s,d)=>s+(Number(d.lkt)||0),0)).toFixed(2);
-  mkDonut('dKQ',[`Đã hoàn thành/Đưa vào sử dụng (${doneCt.length} CT)`,`Đang triển khai (${progArr.length} CT)`],[doneCt.length,progArr.length],['#4ade80','#60a5fa'],{_gn:[doneVal,progVal],_valLabel:'Giá trị thực hiện lũy kế'},false);
+  mkDonut('dKQ',[`Đã hoàn thành/Đưa vào sử dụng (${doneCt.length} CT)`,`Đang triển khai (${progArr.length} CT)`],[doneCt.length,progArr.length],['#4ade80','#60a5fa'],{_gn:[doneVal,progVal],_valLabel:'Giá trị thực hiện lũy kế',_c:[doneVal.toFixed(1)+' tỷ',progVal.toFixed(1)+' tỷ']},false);
+  document.getElementById('cKQ').textContent=doneCt.length+progArr.length;
   ['QL','TL'].forEach(type=>{
     const tuyen=type==='QL'?'Quốc lộ':'Tỉnh lộ';
     const ct=f.filter(d=>d.tuyen===tuyen&&d.tc==='Chuyển tiếp');
@@ -728,14 +740,15 @@ function renderAll(){
   // "Giá trị cần TH trong tháng" (thThang < 0, tức chưa đạt kế hoạch tháng) tại bảng cuối dashboard.
   // Tên rút gọn hiển thị trên biểu đồ/chú giải, tên đầy đủ + số liệu chi tiết hiện qua tooltip khi hover
   // để tránh tràn/vỡ layout biểu đồ.
+  // Tên rút gọn + số liệu chi tiết hiển thị trực tiếp làm legend bên phải vòng tròn (không cần hover
+  // mới thấy nữa); tooltip khi hover vẫn hiện đầy đủ thông tin tương tự.
   const redFlagged = f.filter(d=>(Number(d.thThang)||0)<0);
   if(redFlagged.length){
-    const rfShort = redFlagged.map(d=>(d.name||'').length>16?(d.name||'').slice(0,16)+'…':(d.name||''));
     const rfFull = redFlagged.map(d=>`${d.name}${d.ctr?' — '+d.ctr:''} (chậm ${Math.abs(Number(d.thThang)||0).toFixed(2)} tỷ)`);
     const rfData = redFlagged.map(d=>+Math.max(Math.abs(Number(d.thThang)||0),0.01).toFixed(2));
-    mkDonut('dTienDo',rfShort,rfData,redFlagged.map((_,i)=>CC8[i%CC8.length]),null,false,rfFull);
+    mkDonut('dTienDo',rfFull,rfData,redFlagged.map((_,i)=>CC8[i%CC8.length]),null,false,null,'right');
   }else{
-    mkDonut('dTienDo',['Không có dự án báo đỏ'],[1],['#1a3a45'],null,false);
+    mkDonut('dTienDo',['Không có dự án báo đỏ'],[1],['#1a3a45'],null,false,null,'right');
   }
 
   document.getElementById('tb').innerHTML=f.map((d,i)=>{
